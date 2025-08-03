@@ -223,16 +223,16 @@ function ClassesPage() {
     <Suspense fallback={<div>Loading application components...</div>}>
       <div className="dashboard-container">
         <Sidebar 
-          adminData={adminData} 
+          //adminData={adminData} 
           isOpen={isSidebarOpen} 
           setIsOpen={setIsSidebarOpen} 
         />
         <main className={`main-content ${isSidebarOpen ? '' : 'collapsed'}`}>
-          <Navbar role="admin" toggleSidebar={() => setIsSidebarOpen(prev => !prev)} />
-          <header className="dashboard-header">
+          <Navbar pageTitle={"Classes Management"} role="admin" toggleSidebar={() => setIsSidebarOpen(prev => !prev)} />
+          {/* <header className="dashboard-header">
             <h1>Classes Management</h1>
             <p className="dashboard-subtitle">View and manage all classes</p>
-          </header>
+          </header> */}
 
           <div className="action-and-filter-bar" style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <div className="action-buttons" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>

@@ -13,7 +13,7 @@ function getInitialSidebarOpen() {
 
 function Sidebar({ isOpen, setIsOpen }) {
   const { theme, toggleTheme } = useTheme();
-  const { isSidebarOpen, toggleSidebar } = useTheme();
+  const { isSidebarOpen, toggleSidebar } = useTheme(false);
   const { user } = useAuth();
 
   console.log('isSidebarOpen:', isSidebarOpen);
@@ -41,12 +41,12 @@ function Sidebar({ isOpen, setIsOpen }) {
   //   // eslint-disable-next-line
   // }, []);
 
-  // const toggleSection = (section) => {
-  //   setOpenSections((prev) => ({
-  //     ...prev,
-  //     [section]: !prev[section],
-  //   }));
-  // };
+  const toggleSection = (section) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
 
   // Sidebar open/close for mobile
   // const sidebarClass = () => {

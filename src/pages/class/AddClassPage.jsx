@@ -225,11 +225,11 @@ function AddClassPage() {
             <div className="form-page-container">
                 <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
                 <main className={`main-content ${isSidebarOpen ? '' : 'collapsed'}`}> 
-                    <Navbar role="admin" toggleSidebar={() => setIsSidebarOpen(prev => !prev)} />
-                    <header className="dashboard-header">
+                    <Navbar pageTitle={"Add Class"} role="admin" toggleSidebar={() => setIsSidebarOpen(prev => !prev)} />
+                    {/* <header className="dashboard-header">
                         <h1>Add Class</h1>
                         <p className="dashboard-subtitle">Create a new class in the system</p>
-                    </header>
+                    </header> */}
                     <div className="form-content-wrapper">
                         <form className="enhanced-form add-class-form form-form" onSubmit={handleSubmit}>
                             {/* Class ID */}

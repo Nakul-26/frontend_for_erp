@@ -56,8 +56,6 @@ import MarkTeacherAttendance from './pages/attendence/MarkTeacherAttendance';
 import GetTeacherAttendance from './pages/attendence/GetTeacherAttendance';
 import UpdateTeacherAttendance from './pages/attendence/UpdateTeacherAttendance';
 
-
-
 import './App.css';
 
 function ThemeToggleButton() {
