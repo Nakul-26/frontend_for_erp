@@ -25,7 +25,6 @@ function CreateExamResult() {
     axios.get(`${API}/api/v1/admin/getall`, { withCredentials: true })
       .then(res => {
         setSubjects(res.data.subjects);
-        // console.log('Subjects fetched:', res.data.subjects);
       });
   }, []);
 
@@ -34,8 +33,11 @@ function CreateExamResult() {
       setStudents([]);
       return;
     }
-    axios.get(`${API}/api/v1/admin/getallstudents/${selectedClass}`, { withCredentials: true })
-      .then(res => setStudents(res.data.data || []));
+    axios.get(`${API}/api/v1/admin/studentdata/${selectedClass}`, { withCredentials: true })
+      .then(res => {
+        setStudents(res.data.data || []);
+        console.log('Fetched students:', res.data.data);
+      });
   }, [selectedClass]);
 
   useEffect(() => {
@@ -54,6 +56,11 @@ function CreateExamResult() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log('Submitting payload:', {
+        examId: selectedExam,
+        studentId: selectedStudent,
+        marksObtained
+      });
       await axios.post(`${API}/api/v1/admin/examresult/create`, {
         examId: selectedExam,
         studentId: selectedStudent,
@@ -85,7 +92,10 @@ function CreateExamResult() {
 
             <select required value={selectedStudent} onChange={e => setSelectedStudent(e.target.value)} style={{ padding: 8, borderRadius: 6, width: '100%', marginBottom: 12, border: '1px solid #444', background: 'var(--surface, #222)', color: 'var(--text, #e0e0e0)' }}>
               <option value="">Select Student</option>
-              {students.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+              {students.map(s => {
+                const id = s._id || s.id || s.rollno;
+                return <option key={id} value={id}>{s.name}</option>;
+              })}
             </select>
 
             {marksObtained.map((m, i) => {

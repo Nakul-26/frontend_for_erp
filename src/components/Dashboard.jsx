@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FaUserGraduate, FaCalendarAlt, FaChalkboardTeacher, FaBook } from 'react-icons/fa';
 import '../styles/Dashboard.css';
-import Sidebar from './Sidebar'; // Adjust path if necessary
-import Navbar from './Navbar';   // Adjust path if necessary
-import { useTheme } from '../ThemeContext';
+import Sidebar from './Sidebar';
+import Navbar from './Navbar';
+import { useTheme } from '../../ThemeContext';
+import React from 'react';
 
 function Dashboard() {
   const { theme, toggleTheme } = useTheme();

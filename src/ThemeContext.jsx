@@ -1,28 +1,25 @@
-// frontend2/my-react-app/src/ThemeContext.jsx
-import React, { createContext, useContext, useEffect, useState } from "react";
+// src/contexts/ThemeContext.jsx
+import React, { createContext, useContext, useState } from 'react';
 
 const ThemeContext = createContext();
 
-export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") || "light";
-  });
+export const useTheme = () => useContext(ThemeContext);
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+export const ThemeProvider = ({ children }) => {
+  const [theme, setTheme] = useState('light');
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  const toggleTheme = () =>
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  const toggleTheme = () => {
+    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpen(prev => !prev);
+  };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, isSidebarOpen, toggleSidebar }}>
       {children}
     </ThemeContext.Provider>
   );
-}
-
-export function useTheme() {
-  return useContext(ThemeContext);
-}
+};

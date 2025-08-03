@@ -13,7 +13,10 @@ function getInitialSidebarOpen() {
 
 function Sidebar({ isOpen, setIsOpen }) {
   const { theme, toggleTheme } = useTheme();
+  const { isSidebarOpen, toggleSidebar } = useTheme();
   const { user } = useAuth();
+
+  console.log('isSidebarOpen:', isSidebarOpen);
   
   const [openSections, setOpenSections] = useState({
     classes: false,
@@ -23,38 +26,40 @@ function Sidebar({ isOpen, setIsOpen }) {
   });
 
   // Close sidebar on route change (optional, for better UX)
-  useEffect(() => {
-    if (isOpen === undefined) return;
-    if (!isOpen) {
-      setOpenSections({ classes: false, teachers: false, students: false, subjects: false });
-    }
-  }, [isOpen]);
+  // useEffect(() => {
+  //   if (isOpen === undefined) return;
+  //   if (!isOpen) {
+  //     setOpenSections({ classes: false, teachers: false, students: false, subjects: false });
+  //   }
+  // }, [isOpen]);
 
   // Hide sidebar by default on small screens
-  useEffect(() => {
-    if (typeof isOpen === 'undefined' && typeof setIsOpen === 'function') {
-      setIsOpen(getInitialSidebarOpen());
-    }
-    // eslint-disable-next-line
-  }, []);
+  // useEffect(() => {
+  //   if (typeof isOpen === 'undefined' && typeof setIsOpen === 'function') {
+  //     setIsOpen(getInitialSidebarOpen());
+  //   }
+  //   // eslint-disable-next-line
+  // }, []);
 
-  const toggleSection = (section) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
+  // const toggleSection = (section) => {
+  //   setOpenSections((prev) => ({
+  //     ...prev,
+  //     [section]: !prev[section],
+  //   }));
+  // };
 
   // Sidebar open/close for mobile
-  const sidebarClass = () => {
-    if (typeof isOpen === 'boolean') {
-      return `sidebar${isOpen ? ' open' : ''}`;
-    }
-    return 'sidebar';
-  };
+  // const sidebarClass = () => {
+  //   if (typeof isOpen === 'boolean') {
+  //     return `sidebar${isOpen ? ' open' : ''}`;
+  //   }
+  //   return 'sidebar';
+  // };
+
+  // toggleSidebar(true);
 
   return (
-    <div className={sidebarClass()} data-theme={theme}>
+    <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`} data-theme={theme}>
       <div className="profile-section">
         <div className="profile-image">{user?.Name?.charAt(0) || 'A'}</div>
         <h3>{user?.Name || 'Loading...'}</h3>
@@ -216,6 +221,7 @@ function Sidebar({ isOpen, setIsOpen }) {
             <Link to="/admin/examresult/create" data-icon="➕">Create Exam Result</Link>
             <Link to="/admin/examresult/getbyexam/:examId" data-icon="📋">All Results by Exam</Link>
             <Link to="/admin/examresult/update/:resultId" data-icon="✏️">Update Exam Result</Link>
+            <Link to="/admin/examresult/getbystudent" data-icon="👩‍🎓">Results by Student</Link>
           </div>
         </div>
         
@@ -234,7 +240,7 @@ function Sidebar({ isOpen, setIsOpen }) {
         <Link to="/admin/settings" data-icon="⚙️">Settings</Link> */}
       </nav>
       {/* Mobile close button */}
-      {typeof isOpen === 'boolean' && setIsOpen && (
+      {/* {typeof isOpen === 'boolean' && setIsOpen && (
         <button
           className="sidebar-close-btn"
           style={{ display: 'block' }}
@@ -243,11 +249,11 @@ function Sidebar({ isOpen, setIsOpen }) {
         >
           ×
         </button>
-      )}
+      )} */}
       {/* Theme toggle button for sidebar */}
-      <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
+      {/* <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
         {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-      </button>
+      </button> */}
     </div>
   );
 }

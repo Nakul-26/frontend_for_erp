@@ -49,6 +49,7 @@ import GetSingleExam from './pages/exam/GetSingleExam';
 import CreateExamResult from './pages/exam-result/CreateExamResult';
 import ExamResultsByExam from './pages/exam-result/ExamResultsByExam';
 import UpdateExamResult from './pages/exam-result/UpdateExamResult';
+import ExamResultsByStudent from './pages/exam-result/ExamResultsByStudent';
 
 import MarkStudentAttendance from './pages/attendence/MarkStudentAttendance';
 import MarkTeacherAttendance from './pages/attendence/MarkTeacherAttendance';
@@ -127,6 +128,7 @@ function AppContent() {
           <Route path="/admin/examresult/create" element={<ProtectedRoute element={<CreateExamResult />} requiredRole="admin" />} />
           <Route path="/admin/examresult/getbyexam/:examId" element={<ProtectedRoute element={<ExamResultsByExam />} requiredRole="admin" />} />
           <Route path="/admin/examresult/update/:resultId" element={<ProtectedRoute element={<UpdateExamResult />} requiredRole="admin" />} />
+          <Route path="/admin/examresult/getbystudent" element={<ProtectedRoute element={<ExamResultsByStudent />} requiredRole="admin" />} />
 
           <Route path="/admin/teachers/attendance" element={<ProtectedRoute element={<MarkTeacherAttendance />} requiredRole="admin" />} />
           <Route path="/admin/teacher-attendance" element={<ProtectedRoute element={<GetTeacherAttendance />} requiredRole="admin" />} />

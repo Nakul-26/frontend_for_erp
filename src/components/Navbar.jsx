@@ -1,34 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Navbar.css';
-//import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { useTheme } from '../ThemeContext';
 
-function Navbar({ role, toggleSidebar }) {
-  const [adminData, setAdminData] = useState(null); // Uncomment if needed
+function Navbar({ role, pageTitle }) {
+  const { toggleSidebar } = useTheme();
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-  //const { logout } = useAuth();
   const navigate = useNavigate();
-
-  //If you plan to use adminData, uncomment the lines above and below
-   useEffect(() => {
-    const response = JSON.parse(localStorage.getItem('admindata'));
-    if (response?.data?.admindata) {
-      setAdminData(response.data.admindata);
-    }
-    
-  }, []);
 
   const handleLogout = async () => {
     try {
-      // console.log(response.role.data);
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/admin/logout`, // Adjust the URL based on role
-        //role === 'admin' ? '/api/v1/admin/logout' :
-        //role === 'teacher' ? '/api/v1/teacher/logout' :
-        //role === 'student' ? '/api/v1/student/logout' :
-        //role === 'parent' ? '/api/v1/parent/logout' :
-        {}, // Empty body as per backend requirements
+        `${import.meta.env.VITE_API_URL}/api/v1/admin/logout`, 
+        {},
         {
           withCredentials: true,
           headers: {
@@ -38,10 +23,7 @@ function Navbar({ role, toggleSidebar }) {
       );
   
       if (response.data) {
-        // console.log('Logout successful');
-        // Clear all local storage data
         localStorage.clear();
-        // Redirect to login page
         navigate('/');
       }
     } catch (error) {
@@ -50,8 +32,6 @@ function Navbar({ role, toggleSidebar }) {
         status: error.response?.status
       });
       
-      // Always clear local storage and redirect on error
-      // This ensures user is logged out client-side even if server request fails
       localStorage.clear();
       navigate('/');
     }
@@ -60,9 +40,9 @@ function Navbar({ role, toggleSidebar }) {
   return (
     <header className="dashboard-header">
       <button
-        className="menu-btn"
+        // className="menu-btn"
         onClick={toggleSidebar}
-        aria-label="Toggle sidebar"
+        // aria-label="Toggle sidebar"
       >
         ☰
       </button>
