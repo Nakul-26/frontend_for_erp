@@ -18,7 +18,7 @@
     const [isTableView, setIsTableView] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const [showFilters, setShowFilters] = useState(true);
+    const [showFilters, setShowFilters] = useState(false);
 
     // State for Filters
     const [filters, setFilters] = useState({
