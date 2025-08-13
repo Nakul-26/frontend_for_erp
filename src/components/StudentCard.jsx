@@ -6,10 +6,7 @@ import '../styles/Card.css';
 
 function StudentCard({ student, onDelete }) {
   const navigate = useNavigate();
-  // Sensitive API base URL is now loaded from .env
   const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-  // console.log('StudentCard student:', student); // Debug data (disabled for production)
 
   const handleDelete = async () => {
     if (!window.confirm(`Are you sure you want to delete student ${student.s_id}?`)) return;
@@ -20,28 +17,13 @@ function StudentCard({ student, onDelete }) {
         { withCredentials: true }
       );
       if (response.data.success) {
-        try {
-          const storedStudents = JSON.parse(localStorage.getItem('students')) || [];
-          const updatedStudents = storedStudents.filter((stu) => stu.s_id !== student.s_id);
-          localStorage.setItem('students', JSON.stringify(updatedStudents));
-        } catch (localErr) {
-          console.error('Error updating local storage:', localErr);
-        }
         onDelete(student.s_id);
       } else {
         alert('Failed to delete student');
       }
     } catch (err) {
       alert('Error deleting student from backend. Removing from local data.');
-      console.error('Delete Student Error:', err);
-      try {
-        const storedStudents = JSON.parse(localStorage.getItem('students')) || [];
-        const updatedStudents = storedStudents.filter((stu) => stu.s_id !== student.s_id);
-        localStorage.setItem('students', JSON.stringify(updatedStudents));
-        onDelete(student.s_id);
-      } catch (localErr) {
-        alert('Error deleting from local storage: ' + localErr.message);
-      }
+      // console.error('Delete Student Error:', err);
     }
   };
 

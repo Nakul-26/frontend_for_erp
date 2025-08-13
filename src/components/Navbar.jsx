@@ -13,8 +13,6 @@ function Navbar({ pageTitle}) {
   
   const handleLogout = async () => {
   try {
-    console.log('Logging out user:', user);
-
     const response = await axios.post(
       `${import.meta.env.VITE_API_URL}/api/v1/${user.role}/logout`,
       {},
@@ -32,7 +30,7 @@ function Navbar({ pageTitle}) {
       navigate('/');
     }
   } catch (error) {
-    console.error('Logout error:', error);
+    // console.error('Logout error:', error);
     navigate('/');
   }
 };

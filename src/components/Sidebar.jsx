@@ -62,82 +62,10 @@ function Sidebar({ isOpen, setIsOpen }) {
       </div>
       <nav className="sidebar-nav">
         <Link to="/admin/dashboard" data-icon="🏠">Dashboard</Link>
-        <div className="nav-group">
-          <span
-            className="nav-group-title"
-            data-icon="📚"
-            onClick={() => toggleSection('classes')}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && toggleSection('classes')}
-          >
-            Classes
-          </span>
-          <div className={`nav-subgroup ${openSections.classes ? 'open' : ''}`}>
-            <Link to="/admin/classes" data-icon="👥">All Classes</Link>
-            <Link to="/admin/classes/add" data-icon="➕">Add Class</Link>
-            {/* <Link to="/admin/classes/modify" data-icon="✏️">Modify Class</Link> */}
-            {/* <Link to="/admin/classes/delete" data-icon="🗑️">Delete Class</Link> */}
-          </div>
-        </div>
-        <div className="nav-group">
-          <span
-            className="nav-group-title"
-            data-icon="👩‍🏫"
-            onClick={() => toggleSection('teachers')}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && toggleSection('teachers')}
-          >
-            Teachers
-          </span>
-          <div className={`nav-subgroup ${openSections.teachers ? 'open' : ''}`}>
-            <Link to="/admin/teachers" data-icon="👥">All Teachers</Link>
-            <Link to="/admin/teachers/register" data-icon="➕">Add Teacher</Link>
-            {/* <Link to="/admin/teachers/modify" data-icon="✏️">Modify Teacher</Link> */}
-            {/* <Link to="/admin/teachers/delete" data-icon="🗑️">Delete Teacher</Link> */}
-            
-            
-          </div>
-        </div>
-        <div className="nav-group">
-          <span
-            className="nav-group-title"
-            data-icon="👩‍🎓"
-            onClick={() => toggleSection('students')}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && toggleSection('students')}
-          >
-            Students
-          </span>
-          <div className={`nav-subgroup ${openSections.students ? 'open' : ''}`}>
-            <Link to="/admin/students" data-icon="👥">All Students</Link>
-            <Link to="/admin/students/register" data-icon="➕">Add Student</Link>
-            {/* <Link to="/admin/students/modify" data-icon="✏️">Modify Student</Link> */}
-            {/* <Link to="/admin/students/delete" data-icon="🗑️">Delete Student</Link> */}
-            {/* <Link to="/admin/students/attendance" data-icon="📝">Student Attendance</Link> */}
-          </div>
-        </div>
-        <div className="nav-group">
-          <span
-            className="nav-group-title"
-            data-icon="📖"
-            onClick={() => toggleSection('subjects')}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && toggleSection('subjects')}
-          >
-            Subjects
-          </span>
-          <div className={`nav-subgroup ${openSections.subjects ? 'open' : ''}`}>
-            <Link to="/admin/subjects" data-icon="📋">All Subjects</Link>
-            <Link to="/admin/subjects/add" data-icon="➕">Add Subject</Link>
-            {/* <Link to="/admin/subjects/update" data-icon="✏️">Update Subject</Link> */}
-            {/* <Link to="/admin/subjects/delete" data-icon="🗑️">Delete Subject</Link> */}
-            {/* <Link to="/admin/subjects/search" data-icon="🔍">Search Subject</Link> */}
-          </div>
-        </div>
+        <Link to="/admin/classes" data-icon="📚">Classes</Link>
+        <Link to="/admin/teachers" data-icon="👩‍🏫">Teachers</Link>
+        <Link to="/admin/students" data-icon="👩‍🎓">Students</Link>
+        <Link to="/admin/subjects" data-icon="📖">Subjects</Link>
         <div className="nav-group">
           <span
             className="nav-group-title"
@@ -218,20 +146,6 @@ function Sidebar({ isOpen, setIsOpen }) {
             <Link to="/admin/examresult/update/:resultId" data-icon="✏️">Update Exam Result</Link>
           </div>
         </div>
-        
-        {/* <Link to="/admin/parents/add" data-icon="➕">Add Parent</Link>
-        <Link to="/admin/parents" data-icon="👪">Parents</Link>
-        <Link to="/admin/holidays" data-icon="📅">Holidays</Link>
-        <Link to="/admin/leave" data-icon="📝">Leave Management</Link>
-        <Link to="/admin/teachers/leave" data-icon="🛌">Leave Requests</Link>
-        <Link to="/admin/fees" data-icon="💰">Fees</Link>
-        <Link to="/admin/subjects" data-icon="📚">Subjects</Link>
-        <Link to="/admin/marks" data-icon="📈">Marks</Link>
-        <Link to="/admin/exams" data-icon="📝">Exams</Link>
-        <Link to="/admin/assignments" data-icon="📅">Assignments</Link>
-        <Link to="/admin/notifications" data-icon="🔔">Notifications</Link> */}
-        {/* <Link to="/admin/departments" data-icon="🏢">Departments</Link>
-        <Link to="/admin/settings" data-icon="⚙️">Settings</Link> */}
       </nav>
       {/* Mobile close button */}
       {/* {typeof isOpen === 'boolean' && setIsOpen && (
@@ -244,12 +158,28 @@ function Sidebar({ isOpen, setIsOpen }) {
           ×
         </button>
       )} */}
-      {/* Theme toggle button for sidebar */}
-      <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
-        {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-      </button>
     </div>
   );
 }
 
 export default Sidebar;
+
+
+{/* <div className="nav-group">
+          <span
+            className="nav-group-title"
+            data-icon="📚"
+            onClick={() => toggleSection('classes')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && toggleSection('classes')}
+          >
+            Classes
+          </span>
+          <div className={`nav-subgroup ${openSections.classes ? 'open' : ''}`}>
+            <Link to="/admin/classes" data-icon="👥">All Classes</Link>
+            <Link to="/admin/classes/add" data-icon="➕">Add Class</Link>
+            {/* <Link to="/admin/classes/modify" data-icon="✏️">Modify Class</Link> 
+            {/* <Link to="/admin/classes/delete" data-icon="🗑️">Delete Class</Link> 
+          </div>
+        </div> */}

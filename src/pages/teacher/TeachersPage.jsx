@@ -8,7 +8,6 @@
   import Sidebar from '../../components/Sidebar';
   import Navbar from '../../components/Navbar';
   import TeacherCard from '../../components/TeacherCard';
-  import { useAuth } from '../../context/AuthContext';
 
   // Import the Table component
   const Table = lazy(() => import('../../components/Table'));
@@ -19,7 +18,7 @@
     const [isTableView, setIsTableView] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { adminData } = useAuth();
+    const [showFilters, setShowFilters] = useState(true);
 
     // State for Filters
     const [filters, setFilters] = useState({
@@ -87,7 +86,7 @@
           }
         } catch (err) {
           setError('Unable to fetch teachers from backend.');
-          console.error('Fetch Teachers Error:', err);
+          // console.error('Fetch Teachers Error:', err);
         }
       };
       fetchTeachers();
@@ -246,54 +245,63 @@
               >
                 {isTableView ? 'Show Card View' : 'Show Table View'}
               </button>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="login-button"
+                style={{ minWidth: '120px', fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              >
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
+              </button>
             </div>
 
             {/* Filter Controls */}
-            <div className="filter-controls" style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', border: '1px solid var(--border, #222)', borderRadius: '8px', backgroundColor: 'var(--surface, #222)' }}>
-              <h3>Filter By:</h3>
-              {/* Subject Filter */}
-              <select name="subject" value={filters.subject} onChange={handleFilterChange} className="filter-select">
-                <option value="">All Subjects</option>
-                {uniqueSubjects.map(subject => (
-                  <option key={subject} value={subject}>{subject}</option>
-                ))}
-              </select>
+            {showFilters && (
+              <div className="filter-controls" style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', border: '1px solid var(--border, #222)', borderRadius: '8px', backgroundColor: 'var(--surface, #222)' }}>
+                <h3>Filter By:</h3>
+                {/* Subject Filter */}
+                <select name="subject" value={filters.subject} onChange={handleFilterChange} className="filter-select">
+                  <option value="">All Subjects</option>
+                  {uniqueSubjects.map(subject => (
+                    <option key={subject} value={subject}>{subject}</option>
+                  ))}
+                </select>
 
-              {/* Status Filter */}
-              <select name="status" value={filters.status} onChange={handleFilterChange} className="filter-select">
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+                {/* Status Filter */}
+                <select name="status" value={filters.status} onChange={handleFilterChange} className="filter-select">
+                  <option value="">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
 
-              {/* Joining Year Filter */}
-              <select name="joiningYear" value={filters.joiningYear} onChange={handleFilterChange} className="filter-select">
-                <option value="">All Joining Years</option>
-                {uniqueJoiningYears.map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
+                {/* Joining Year Filter */}
+                <select name="joiningYear" value={filters.joiningYear} onChange={handleFilterChange} className="filter-select">
+                  <option value="">All Joining Years</option>
+                  {uniqueJoiningYears.map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
 
-              {/* Sort Controls */}
-              <h3>Sort By:</h3>
-              <select name="sortField" value={sortBy.field} onChange={handleSortChange} className="filter-select">
-                <option value="">No Sort</option>
-                <option value="name">Name</option>
-                <option value="id">Teacher ID</option>
-                <option value="age">Age</option>
-                <option value="dateofjoining">Joining Date</option>
-                <option value="status">Status</option>
-              </select>
+                {/* Sort Controls */}
+                <h3>Sort By:</h3>
+                <select name="sortField" value={sortBy.field} onChange={handleSortChange} className="filter-select">
+                  <option value="">No Sort</option>
+                  <option value="name">Name</option>
+                  <option value="id">Teacher ID</option>
+                  <option value="age">Age</option>
+                  <option value="dateofjoining">Joining Date</option>
+                  <option value="status">Status</option>
+                </select>
 
-              <select name="sortOrder" value={sortBy.order} onChange={handleSortChange} className="filter-select">
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-              </select>
+                <select name="sortOrder" value={sortBy.order} onChange={handleSortChange} className="filter-select">
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
 
-              <button onClick={clearFiltersAndSort} className="clear-filters-btn">
-                Clear Filters & Sort
-              </button>
-            </div>
+                <button onClick={clearFiltersAndSort} className="clear-filters-btn">
+                  Clear Filters & Sort
+                </button>
+              </div>
+            )}
           </div>
 
           {error && (

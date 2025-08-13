@@ -69,15 +69,11 @@ function MarkTeacherAttendance() {
     const API_BASE_URL = import.meta.env.VITE_API_URL;
 
     try {
-      // console.log('Submitting attendance records:', attendanceRecords);
       const response = await axios.post(
         `${API_BASE_URL}/api/v1/admin/teacher-attendance`,
         attendanceRecords[0],
         { withCredentials: true }
       );
-
-      // console.log('Attendance response:', response.data);
-      // console.log('Attendance response:', response.data.status);
 
       if (response.data.status == "201") {
         setSuccess('Teacher attendance marked successfully');

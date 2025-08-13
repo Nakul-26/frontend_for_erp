@@ -48,7 +48,7 @@ function TeacherChangePassword() {
         }, 2000);
       }
     } catch (error) {
-      console.error('Password change error:', error);
+      // console.error('Password change error:', error);
       const errorMessage = error.response?.data?.error?.errors?.[0] || 'Failed to change password. Please try again.';
       setMessage(errorMessage);
       setIsSuccess(false);

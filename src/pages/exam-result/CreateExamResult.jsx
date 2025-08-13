@@ -25,7 +25,6 @@ function CreateExamResult() {
     axios.get(`${API}/api/v1/admin/getall`, { withCredentials: true })
       .then(res => {
         setSubjects(res.data.subjects);
-        // console.log('Subjects fetched:', res.data.subjects);
       });
   }, []);
 

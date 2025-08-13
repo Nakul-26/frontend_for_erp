@@ -33,7 +33,7 @@ function GenerateTimetablePage() {
                 setClasses(response.data.data);
             }
         } catch (err) {
-            console.error('Error fetching classes:', err);
+            // console.error('Error fetching classes:', err);
             setError('Failed to fetch classes.');
         }
     };
@@ -90,7 +90,7 @@ function GenerateTimetablePage() {
                 setError(response.data.message || 'Failed to generate timetable.');
             }
         } catch (err) {
-            console.error('Timetable generation error:', err);
+            // console.error('Timetable generation error:', err);
             setError(err.response?.data?.message || 'An error occurred during timetable generation.');
         } finally {
             setLoading(false);

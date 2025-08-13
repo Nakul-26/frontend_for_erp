@@ -88,10 +88,8 @@ function ModifyClassPage() {
 
                 // If paramClassId exists and is not 'new', fetch existing class data
                 const classResponse = await axios.get(`${API_BASE_URL}/api/v1/admin/class/${paramClassId}`, { withCredentials: true });
-                // console.log("Class Response:", classResponse.data); // Debugging log
                 if (classResponse.data.success && classResponse.data.data) {
                     const fetchedClass = classResponse.data.data;
-                    // console.log("Fetched Class Data, subjects:", fetchedClass.subjects); // Debugging log
                     setFormData({
                         classId: fetchedClass.classId || '', // Use classId
                         name: fetchedClass.name || '',
@@ -110,7 +108,7 @@ function ModifyClassPage() {
                     throw new Error(classResponse.data.message || 'Failed to fetch class data.');
                 }
             } catch (err) {
-                console.error("Error fetching initial data:", err);
+                // console.error("Error fetching initial data:", err);
                 setError(err.response?.data?.message || `Failed to load data for ID: ${paramClassId}. Please check the class ID or network.`);
                 // Reset form data if fetching fails, unless it's a new class entry that failed on initial data fetch
                 if (paramClassId !== "new") {
@@ -243,7 +241,7 @@ function ModifyClassPage() {
                     if (deleteResponse.data.success) {
                         setSuccess(`Class ID changed from '${initialClassId}' to '${formData.classId}'. Original class deleted successfully.`);
                     } else {
-                        console.warn(`Warning: New class created, but failed to delete old class '${initialClassId}'.`);
+                        // console.warn(`Warning: New class created, but failed to delete old class '${initialClassId}'.`);
                         setError(`Class updated (new ID: ${formData.classId}), but failed to delete original class '${initialClassId}'.`);
                     }
                     setTimeout(() => navigate('/admin/classes'), 2000);
@@ -267,7 +265,7 @@ function ModifyClassPage() {
                 }
             }
         } catch (err) {
-            console.error("Modify Class Error:", err);
+            // console.error("Modify Class Error:", err);
             // More robust error handling
             if (err.response) {
                 setError(err.response.data?.message || `Server Error: ${err.response.status}`);

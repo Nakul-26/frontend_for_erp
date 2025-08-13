@@ -35,7 +35,7 @@ function TeacherLogin() {
         setError(response.data.message);
       }
     } catch (err) { 
-      console.error('Login Error:', err);
+      // console.error('Login Error:', err);
       if (err.response) {
         setError(err.response.data.message || 'Login failed. Please check your inputs.');
       } else if (err.request) {

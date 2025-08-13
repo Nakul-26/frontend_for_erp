@@ -49,11 +49,11 @@ function ModifyTeacherPage() {
         if (response.data.success && Array.isArray(response.data.data)) {
           setAllClasses(response.data.data);
         } else {
-          console.error('Invalid response format for classes');
+          // console.error('Invalid response format for classes');
           setError('Failed to fetch classes.');
         }
       } catch (err) {
-        console.error('Error fetching classes:', err);
+        // console.error('Error fetching classes:', err);
         setError('Failed to load available classes.');
       }
     };
@@ -87,8 +87,6 @@ function ModifyTeacherPage() {
         setSearchResult(teacher);
         setOriginalId(teacher.id);
 
-        // console.log('Teacher found:', teacher);
-
         setFormData({
           id: teacher.id,
           name: teacher.name,
@@ -115,7 +113,7 @@ function ModifyTeacherPage() {
       }
     } catch (err) {
       setError(`Unable to fetch teacher: ${err.response?.data?.message || err.message}. Please check the ID.`);
-      console.error('Search Teacher Error:', err);
+      // console.error('Search Teacher Error:', err);
     }
   }, [searchData.id, API_BASE_URL]);
 
@@ -221,8 +219,6 @@ function ModifyTeacherPage() {
     // LOGIC FOR CHANGING TEACHER ID (DELETE OLD, REGISTER NEW) vs. UPDATE EXISTING
     if (formData.id !== originalId && originalId !== null) {
       // Scenario: Teacher ID has been changed
-      // console.log(`Teacher ID changed from ${originalId} to ${formData.id}. Attempting to register new and delete old.`);
-
       if (!formData.password) {
         setError('Password is required when changing Teacher ID (new registration).');
         setLoading(false);
@@ -240,7 +236,6 @@ function ModifyTeacherPage() {
         );
 
         if (registerResponse.data.success) {
-          // console.log(`New teacher ${formData.id} registered successfully.`);
           try {
             const deleteResponse = await axios.delete(
               `${API_BASE_URL}/api/v1/admin/teacher/${originalId}`,
@@ -249,30 +244,25 @@ function ModifyTeacherPage() {
 
             if (deleteResponse.data.success) {
               setSuccess(`Teacher ID changed from ${originalId} to ${formData.id} successfully.`);
-              // console.log(`Old teacher ${originalId} deleted successfully.`);
               setTimeout(() => navigate('/admin/teachers'), 2000);
             } else {
               setError(`New teacher ${formData.id} registered, but failed to delete old teacher ${originalId}.`);
-              console.error('Delete Old Teacher Error:', deleteResponse.data.message);
+              // console.error('Delete Old Teacher Error:', deleteResponse.data.message);
             }
           } catch (deleteErr) {
             setError(`New teacher ${formData.id} registered, but encountered error deleting old teacher ${originalId}.`);
-            console.error('Delete Old Teacher Network Error:', deleteErr);
+            // console.error('Delete Old Teacher Network Error:', deleteErr);
           }
         } else {
           setError(`Failed to register new teacher with ID ${formData.id}. ${registerResponse.data.message || ''}`);
-          console.error('Register New Teacher Error:', registerResponse.data.message);
+          // console.error('Register New Teacher Error:', registerResponse.data.message);
         }
       } catch (registerErr) {
         setError(`Unable to register new teacher with ID ${formData.id} via backend. It might already exist or there's a server issue.`);
-        console.error('Register New Teacher Network Error:', registerErr.response?.data?.message || registerErr.message);
+        // console.error('Register New Teacher Network Error:', registerErr.response?.data?.message || registerErr.message);
       }
     } else {
       // Scenario: Teacher ID has NOT been changed
-      // console.log(`Updating existing teacher ${formData.id}.`);
-      
-      //commonTeacherData.append('status', formData.status);
-
       try {
         const response = await axios.put(
           `${API_BASE_URL}/api/v1/admin/teacher/${formData.id}`,
@@ -288,7 +278,7 @@ function ModifyTeacherPage() {
         }
       } catch (err) {
         setError(`Unable to update teacher: ${err.response?.data?.message || err.message}.`);
-        console.error('Update Teacher Error:', err);
+        // console.error('Update Teacher Error:', err);
       }
     }
     setLoading(false);
@@ -303,8 +293,6 @@ function ModifyTeacherPage() {
     if (!isConfirmed) {
       return;
     }
-
-    // console.log(`Attempting to delete teacher with ID: ${searchData.id}.`);
 
     try {
       const response = await axios.delete(
@@ -330,7 +318,7 @@ function ModifyTeacherPage() {
       }
     } catch (err) {
       setError(`Unable to delete teacher: ${err.response?.data?.message || err.message}.`);
-      console.error('Delete Teacher Error:', err);
+      // console.error('Delete Teacher Error:', err);
     }
   };
 

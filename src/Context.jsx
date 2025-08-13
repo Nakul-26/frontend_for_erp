@@ -11,6 +11,7 @@ export const ThemeProvider = ({ children }) => {
 
   const toggleTheme = () => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+    // document.documentElement.setAttribute('data-theme', theme);
   };
 
   const toggleSidebar = () => {

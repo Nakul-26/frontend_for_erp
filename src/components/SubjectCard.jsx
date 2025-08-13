@@ -8,8 +8,6 @@ function SubjectCard({ subject, onDelete }) {
   const navigate = useNavigate();
   const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-  // console.log('SubjectCard subject:', subject); // Debug data
-
   const handleDelete = async () => {
     //if (!window.confirm(`Are you sure you want to delete subject ${subject.code}?`)) return;
 
@@ -25,7 +23,7 @@ function SubjectCard({ subject, onDelete }) {
       //}
     } catch (err) {
       alert('Error deleting subject from backend.');
-      console.error('Delete Subject Error:', err);
+      // console.error('Delete Subject Error:', err);
     }
   };
 

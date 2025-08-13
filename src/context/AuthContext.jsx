@@ -2,10 +2,7 @@
 import React, { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext();
-
 export const AuthProvider = ({ children }) => {
-
-  // Store user info and role
   const [user, setUser] = useState(() => {
     try {
       const storedData = localStorage.getItem('user');
@@ -21,7 +18,6 @@ export const AuthProvider = ({ children }) => {
   // data should include { name, role, ... }
   const login = (data) => {
     setUser(data);
-    console.log('User logged in:', data);
     localStorage.setItem('user', JSON.stringify(data));
   };
 

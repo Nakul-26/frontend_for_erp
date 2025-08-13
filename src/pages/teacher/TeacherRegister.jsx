@@ -44,11 +44,11 @@ function TeacherRegister() {
         if (response.data.success && Array.isArray(response.data.data)) {
           setAllClasses(response.data.data);
         } else {
-          console.error('Invalid response format for classes');
+          // console.error('Invalid response format for classes');
           setError('Failed to fetch classes.');
         }
       } catch (err) {
-        console.error('Error fetching classes:', err);
+        // console.error('Error fetching classes:', err);
         setError('Failed to load available classes.');
       }
     };
@@ -157,7 +157,7 @@ function TeacherRegister() {
         throw new Error(response.data.message || 'Failed to register teacher.');
       }
     } catch (err) {
-      console.error("Teacher Registration Error:", err);
+      // console.error("Teacher Registration Error:", err);
       setError(err.response?.data?.message || err.message || 'Unable to register teacher via backend.');
     } finally {
       setLoading(false);

@@ -39,7 +39,7 @@ function CreateAttendance() {
           throw new Error('Failed to fetch classes.');
         }
       } catch (err) {
-        console.error('Error fetching teacher classes:', err);
+        // console.error('Error fetching teacher classes:', err);
         setError('Failed to load your classes. Please try again.');
         setClasses([]);
       } finally {
@@ -102,7 +102,7 @@ function CreateAttendance() {
           throw new Error('Failed to fetch students.');
         }
       } catch (err) {
-        console.error('Error fetching students or attendance:', err);
+        // console.error('Error fetching students or attendance:', err);
         setError('Failed to load students or attendance for this class.');
         setStudents([]);
         setAttendanceRecords({});
@@ -169,7 +169,7 @@ function CreateAttendance() {
         throw new Error(response.data.message || 'Failed to mark attendance.');
       }
     } catch (err) {
-      console.error('Error submitting attendance:', err);
+      // console.error('Error submitting attendance:', err);
       const errorMessage = err.response?.data?.error?.errors?.[0] || 'Failed to mark attendance. Please try again.';
       setError(errorMessage);
     } finally {

@@ -8,8 +8,6 @@ function Card({ data, type, onDelete, fields }) {
   const navigate = useNavigate();
   const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-  // console.log(`Card data (${type}):`, data);
-
   const handleDelete = async () => {
     const idField = type === 'class' ? 'c_id' : 'id'; // Ensure 's_id' for teachers
     const id = data[idField];
@@ -31,7 +29,7 @@ function Card({ data, type, onDelete, fields }) {
           const updatedItems = storedItems.filter((item) => item[idField] !== id);
           localStorage.setItem(storageKey, JSON.stringify(updatedItems));
         } catch (localErr) {
-          console.error('Error updating local storage:', localErr);
+          // console.error('Error updating local storage:', localErr);
         }
         onDelete(id);
       } else {

@@ -19,7 +19,6 @@ function CreateExam() {
       try {
         const res = await axios.get(`${API_BASE_URL}/api/v1/admin/getallclassformapped`, { withCredentials: true });
         setClasses(res.data.data || []);
-        // console.log('Classes fetched:', res.data.data);
       } catch (error) {
         // Optionally handle error
         setClasses([]);
@@ -38,7 +37,6 @@ function CreateExam() {
     axios.get(`${API_BASE_URL}/api/v1/admin/getClassMappings/${selectedClass}`, { withCredentials: true })
       .then(res => {
         // Extract unique subjects from mapping pairs
-        // console.log('Fetched subjects for class:', res.data);
         const pairs = res.data.data || [];
         const subjectsMap = {};
         pairs.forEach(m => {

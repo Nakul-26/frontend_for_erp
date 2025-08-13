@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import TeacherSidebar from '../../components/TeacherSidebar';
 import Navbar from '../../components/Navbar';
-import '../../styles/Dashboard.css'; // Make sure this CSS file includes the table styles
+import '../../styles/Dashboard.css'; // Common styles
 import { useAuth } from '../../context/AuthContext';
 
 function GetTeacherSchedule() {
@@ -24,10 +24,9 @@ function GetTeacherSchedule() {
         `${API_BASE_URL}/api/v1/teacher/schedule/${user._id}`,
         { withCredentials: true }
       );
-      console.log('Teacher schedule:', response.data.data);
       setSchedule(response.data.data || []);
     } catch (err) {
-      console.error('Failed to fetch teacher schedule:', err);
+      // console.error('Failed to fetch teacher schedule:', err);
       setError('Failed to fetch your schedule. Please try again.');
     } finally {
       setLoading(false);
@@ -38,6 +37,7 @@ function GetTeacherSchedule() {
     fetchTeacherSchedule();
   }, [user?._id, API_BASE_URL]);
 
+  // Function to render the schedule based on fetched data
   const renderSchedule = () => {
     if (loading) {
       return <p>Loading schedule...</p>;
@@ -49,41 +49,34 @@ function GetTeacherSchedule() {
       return <p>No schedule found.</p>;
     }
 
-    // Get period names for the table header from the first day's schedule
-    const periods = schedule[0]?.periods.map(p => p.period.period) || [];
-
     return (
-      <div className="schedule-table-container">
-        <table className="schedule-table">
-          <thead>
-            <tr>
-              <th>Day</th>
-              {periods.map((period, index) => (
-                <th key={index}>{period}</th>
+      <div className="schedule-list">
+        {schedule.map((dayEntry, dayIndex) => (
+          <div key={dayIndex} className="schedule-day-entry">
+            <h3 className="day-header">{dayEntry.day}</h3>
+            <div className="day-periods">
+              {dayEntry.periods.map((periodEntry, periodIndex) => (
+                <div key={periodIndex} className="period-item">
+                  <div className="period-time">
+                    {periodEntry.period.period}: {periodEntry.period.startTime} - {periodEntry.period.endTime}
+                  </div>
+                  {/* Check if mapped and subjectId exist before accessing */}
+                  {periodEntry.mapped?.subjectId && (
+                    <div className="period-subject">
+                      Subject: {periodEntry.mapped.subjectId.subjectName}
+                    </div>
+                  )}
+                  {dayEntry.classId?.classId && (
+                    <div className="period-class">
+                      Class: {dayEntry.classId.classId}
+                    </div>
+                  )}
+                </div>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {schedule.map((dayEntry, dayIndex) => (
-              <tr key={dayIndex}>
-                <td>{dayEntry.day}</td>
-                {dayEntry.periods.map((periodEntry, periodIndex) => (
-                  <td key={periodIndex}>
-                    {/* Check if mapped and subjectId exist before accessing */}
-                    {periodEntry.mapped?.subjectId ? (
-                      <>
-                        <div className="subject-name">{periodEntry.mapped.subjectId.subjectName}</div>
-                        <div className="class-id">({dayEntry.classId?.classId})</div>
-                      </>
-                    ) : (
-                      <div className="empty-slot">-</div>
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </div>
+            <hr /> {/* Add a separator between days */}
+          </div>
+        ))}
       </div>
     );
   };

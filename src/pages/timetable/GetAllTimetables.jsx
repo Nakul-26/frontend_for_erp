@@ -26,7 +26,6 @@ function GetAllTimetables() {
     setTimetables([]);
     try {
       const res = await axios.get(`${API_BASE_URL}/api/v1/admin/getalldailyschedules/${classId}`, { withCredentials: true });
-      // console.log('Timetables fetched:', res.data.data);
       setTimetables(res.data.data || []);
     } catch (err) {
       setError('Failed to fetch timetables.');

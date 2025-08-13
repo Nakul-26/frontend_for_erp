@@ -47,7 +47,6 @@ function StudentRegister() {
         const response = await axios.get(`${API_BASE_URL}/api/v1/admin/getallclass`,
           { withCredentials: true }
         );
-        // console.log('Classes fetched:', response.data);
         if (response.data.success && Array.isArray(response.data.data)) {
           setClasses(response.data.data);
         }

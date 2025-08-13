@@ -58,7 +58,7 @@ function MappedPage() {
         }
 
       } catch (err) {
-        console.error('Error fetching data for Mapped Page:', err);
+        // console.error('Error fetching data for Mapped Page:', err);
         setError(`Failed to load data: ${err.response?.data?.message || err.message}`);
       } finally {
         setLoading(false);
@@ -122,7 +122,7 @@ function MappedPage() {
         setError(response.data.message || 'Mapping failed.');
       }
     } catch (err) {
-      console.error('Mapping submission error:', err);
+      // console.error('Mapping submission error:', err);
       setError(err.response?.data?.message || 'An error occurred during mapping.');
     }
   };

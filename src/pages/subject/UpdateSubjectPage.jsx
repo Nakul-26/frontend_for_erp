@@ -79,7 +79,7 @@ function UpdateSubjectPage() {
           throw new Error('Subject not found or failed to fetch details.');
         }
       } catch (err) {
-        console.error("Error fetching subject details:", err);
+        // console.error("Error fetching subject details:", err);
         setError(err.response?.data?.message || 'Failed to load subject details from backend. Please check the subject code.');
         // If an error occurs, reset form data to prevent displaying incorrect previous data
         setFormData({
@@ -147,7 +147,7 @@ function UpdateSubjectPage() {
         );
 
         if (deleteResponse.data.status !== "success") {
-          console.warn(`Warning: New subject created, but failed to delete old subject '${initialSubjectCode}'.`);
+          // console.warn(`Warning: New subject created, but failed to delete old subject '${initialSubjectCode}'.`);
           setError(`Subject updated, but failed to delete original subject '${initialSubjectCode}'.`);
         } else {
           setSuccess(`Subject code changed from '${initialSubjectCode}' to '${formData.code}'. Original subject deleted successfully.`);
@@ -174,20 +174,17 @@ function UpdateSubjectPage() {
           subjectData,
           { withCredentials: true }
         );
-        // console.log("1 Update Subject Response:", response.data);
         if (response.data.success === true) {
-          // console.log("2 Subject updated successfully:", response.data);
           setSuccess('Subject updated successfully');
         } else {
-          console.error("3 Failed to update subject:", response.data);
+          // console.error("3 Failed to update subject:", response.data);
           throw new Error(response.data.message || 'Failed to update subject');
         }
       }
-      // console.log("4 Operation completed successfully, navigating to subjects list.");
       setTimeout(() => navigate('/admin/subjects'), 2000);
     } catch (err) {
-      console.error("5 Error during subject operation:", err);
-      console.error("Update/Create/Delete Subject Error:", err);
+      // console.error("5 Error during subject operation:", err);
+      // console.error("Update/Create/Delete Subject Error:", err);
       // More specific error messages based on `err.response` if available
       setError(err.response?.data?.message || 'Unable to complete subject operation via backend.');
     }

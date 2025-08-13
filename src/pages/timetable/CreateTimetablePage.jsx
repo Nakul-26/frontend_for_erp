@@ -27,22 +27,20 @@ function CreateTimetablePage() {
   const fetchClasses = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/v1/admin/getallclassformapped`, { withCredentials: true });
-      // console.log('Classes fetched:', res.data.data);
       setClasses(res.data.data || []);
     } catch (err) {
       setError('Failed to fetch classes.');
-      console.error(err);
+      // console.error(err);
     }
   };
 
   const fetchTimeSlots = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/v1/admin/getallslots`, { withCredentials: true });
-      // console.log('Time slots fetched:', res.data);
       setTimeSlots(res.data || []);
     } catch (err) {
       setError('Failed to fetch time slots.');
-      console.error(err);
+      // console.error(err);
     }
   };
 
@@ -61,16 +59,13 @@ function CreateTimetablePage() {
       });
       const uniqueSubjects = Object.values(subjectsMap);
       const uniqueTeachers = Object.values(teachersMap);
-      // console.log('Subjects fetched:', uniqueSubjects);
-      // console.log('Teachers fetched:', uniqueTeachers);
-      // console.log('Mapped pairs fetched:', pairs);
       setSubjects(uniqueSubjects);
       setTeachers(uniqueTeachers);
       setMappedPairs(pairs);
       setError('');
     } catch (err) {
       setError('Failed to fetch subjects, teachers, or mappings.');
-      console.error(err);
+      // console.error(err);
     }
   };
 
@@ -183,7 +178,6 @@ function CreateTimetablePage() {
               mapped: mappedId
             };
           });
-        // console.log('Final periods payload:', JSON.stringify(periods, null, 2));
         const payload = {
           day,
           periods
@@ -193,7 +187,7 @@ function CreateTimetablePage() {
       setSuccess('Timetable created successfully!');
     } catch (err) {
       setError('Failed to create timetable.');
-      console.error(err);
+      // console.error(err);
     } finally {
       setLoading(false);
     }

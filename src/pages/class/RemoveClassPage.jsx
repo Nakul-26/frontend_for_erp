@@ -12,7 +12,7 @@ function RemoveClassPage() {
 
     const API_BASE_URL = import.meta.env.VITE_API_URL;
     if (!API_BASE_URL) {
-        console.error('API URL is missing in environment variables.');
+        // console.error('API URL is missing in environment variables.');
     }
 
     const handleChange = (e) => {
@@ -54,7 +54,7 @@ function RemoveClassPage() {
                 setError(response.data.message || 'Failed to delete class.');
             }
         } catch (err) {
-            console.error("Delete Class Error:", err);
+            // console.error("Delete Class Error:", err);
             // Provide a more descriptive error from the response, or a fallback
             setError(err.response?.data?.message || err.message || 'An unexpected error occurred while deleting the class.');
         } finally {

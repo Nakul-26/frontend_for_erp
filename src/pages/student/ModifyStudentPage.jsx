@@ -37,8 +37,6 @@ function ModifyStudentPage() {
   const queryParams = new URLSearchParams(location.search);
   const s_id = queryParams.get('s_id');
 
-  // console.log('Extracted s_id:', s_id);
-
   useEffect(() => {
     const fetchStudentData = async () => {
       if (!s_id) {
@@ -56,8 +54,6 @@ function ModifyStudentPage() {
           `${API_BASE_URL}/api/v1/admin/student/${s_id}`,
           { withCredentials: true }
         );
-
-        // console.log('Backend Student Data Response:', response.data);
 
         if (response.data.success && response.data.data) {
           const data = response.data.data;
@@ -82,7 +78,7 @@ function ModifyStudentPage() {
         }
       } catch (err) {
         setError('Error fetching student data: ' + err.message);
-        console.error('Fetch Student Error:', err);
+        // console.error('Fetch Student Error:', err);
       } finally {
         setLoading(false);
       }
@@ -111,8 +107,6 @@ function ModifyStudentPage() {
         { withCredentials: true }
       );
 
-      // console.log('Update Response:', response.data);
-
       if (response.data.success) {
         alert('Student updated successfully');
         navigate('/admin/students');
@@ -121,7 +115,7 @@ function ModifyStudentPage() {
       }
     } catch (err) {
       setError('Error updating student: ' + err.message);
-      console.error('Update Student Error:', err);
+      // console.error('Update Student Error:', err);
     }
   };
 

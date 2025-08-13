@@ -45,9 +45,6 @@ function SearchClass() {
         `${API_BASE_URL}/api/v1/admin/class/${searchQuery}`,
         { withCredentials: true }
       );
-
-      // console.log('Search response:', response.data); // Debugging log
-
       if (response.data.success === true && response.data.data) {
         // Assuming 'response.data.data' directly contains the single class object
         setSearchResult(response.data.data);
@@ -59,8 +56,8 @@ function SearchClass() {
       }
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred while fetching the class from backend.');
-      console.error('Search error:', err); // Debugging log
-      console.error('Error details:', err.response?.data); // Log error details for more info
+      // console.error('Search error:', err); // Debugging log
+      // console.error('Error details:', err.response?.data); // Log error details for more info
       setSearchResult(null); // Ensure searchResult is null on error
     } finally {
       setLoading(false);

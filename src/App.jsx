@@ -63,7 +63,7 @@ import './App.css';
 
 function ThemeToggleButton() {
   const { theme, toggleTheme } = useTheme();
-  console.log(`Current appjsx theme: ${theme}`);
+  document.documentElement.setAttribute('data-theme', theme);
   return (
     <button className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">
       {theme === 'light' ? '🌙 Dark' : '☀️ Light'}

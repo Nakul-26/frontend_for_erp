@@ -40,7 +40,7 @@ function ClassCard({ classData, onDelete, allSubjects }) {
                 alert(response.data.message || 'Failed to delete class from backend.');
             }
         } catch (err) {
-            console.error('Error deleting class:', err);
+            // console.error('Error deleting class:', err);
             const errorMessage = err.response?.data?.message || err.message || 'Error deleting class from backend.';
             alert(errorMessage);
             // Do NOT try to manipulate localStorage here.

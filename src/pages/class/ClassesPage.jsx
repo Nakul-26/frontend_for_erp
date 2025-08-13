@@ -19,6 +19,7 @@ function ClassesPage() {
   const { adminData } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 900);
   
   // Handle window resize
@@ -103,7 +104,7 @@ function ClassesPage() {
 
       } catch (err) {
         setError('Unable to fetch data. Please check your connection or server.');
-        console.error("Fetch error:", err);
+        // console.error("Fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -229,10 +230,6 @@ function ClassesPage() {
         />
         <main className={`main-content ${isSidebarOpen ? '' : 'collapsed'}`}>
           <Navbar pageTitle={"Classes Management"} role="admin" toggleSidebar={() => setIsSidebarOpen(prev => !prev)} />
-          {/* <header className="dashboard-header">
-            <h1>Classes Management</h1>
-            <p className="dashboard-subtitle">View and manage all classes</p>
-          </header> */}
 
           <div className="action-and-filter-bar" style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <div className="action-buttons" style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
@@ -246,70 +243,74 @@ function ClassesPage() {
               >
                 {isTableView ? 'Show Card View' : 'Show Table View'}
               </button>
-            </div>
-
-            {/* Filter Controls */}
-          <div className="filter-controls" style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', border: '1px solid var(--border, #222)', borderRadius: '8px', backgroundColor: 'var(--surface, #222)' }}>
-              <h3>Filter By:</h3>
-              {/* Academic Year Filter */}
-              <select name="academicYear" value={filters.academicYear} onChange={handleFilterChange} className="filter-select">
-                <option value="">All Academic Years</option>
-                {uniqueAcademicYears.map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-
-              {/* Section Filter */}
-              <select name="section" value={filters.section} onChange={handleFilterChange} className="filter-select">
-                <option value="">All Sections</option>
-                {uniqueSections.map(section => (
-                  <option key={section} value={section}>{section}</option>
-                ))}
-              </select>
-
-              {/* Status Filter */}
-              <select name="status" value={filters.status} onChange={handleFilterChange} className="filter-select">
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-
-              {/* Subject Filter */}
-              <select name="subject" value={filters.subject} onChange={handleFilterChange} className="filter-select">
-                <option value="">All Subjects</option>
-                {allSubjects.map(subject => (
-                  <option key={subject._id} value={subject._id}>{subject.name} ({subject.code})</option>
-                ))}
-              </select>
-
-              {/* Class Teacher Filter */}
-              <select name="classteacher" value={filters.classteacher} onChange={handleFilterChange} className="filter-select">
-                <option value="">All Class Teachers</option>
-                {uniqueClassTeachers.map(teacher => (
-                  <option key={teacher} value={teacher}>{teacher}</option>
-                ))}
-              </select>
-
-              {/* Sort Controls */}
-              <h3>Sort By:</h3>
-              <select name="sortField" value={sortBy.field} onChange={handleSortChange} className="filter-select">
-                <option value="">No Sort</option>
-                <option value="name">Class Name</option>
-                <option value="nostudent">No. of Students</option>
-                <option value="academicYear">Academic Year</option>
-                <option value="status">Status</option>
-                <option value="classteacher">Class Teacher</option>
-              </select>
-
-              <select name="sortOrder" value={sortBy.order} onChange={handleSortChange} className="filter-select">
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-              </select>
-
-              <button onClick={clearFiltersAndSort} className="clear-filters-btn">
-                Clear Filters & Sort
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="login-button"
+                style={{ minWidth: '120px', fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              >
+                {showFilters ? 'Hide Filters' : 'Show Filters'}
               </button>
             </div>
+
+            {/* Conditionally render the filter controls */}
+            {showFilters && (
+              <div className="filter-controls" style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', border: '1px solid var(--border, #222)', borderRadius: '8px', backgroundColor: 'var(--surface, #222)' }}>
+                <h3>Filter By:</h3>
+                {/* ... (rest of your filter selects) ... */}
+                <select name="academicYear" value={filters.academicYear} onChange={handleFilterChange} className="filter-select">
+                  <option value="">All Academic Years</option>
+                  {uniqueAcademicYears.map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+
+                <select name="section" value={filters.section} onChange={handleFilterChange} className="filter-select">
+                  <option value="">All Sections</option>
+                  {uniqueSections.map(section => (
+                    <option key={section} value={section}>{section}</option>
+                  ))}
+                </select>
+
+                <select name="status" value={filters.status} onChange={handleFilterChange} className="filter-select">
+                  <option value="">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+
+                <select name="subject" value={filters.subject} onChange={handleFilterChange} className="filter-select">
+                  <option value="">All Subjects</option>
+                  {allSubjects.map(subject => (
+                    <option key={subject._id} value={subject._id}>{subject.name} ({subject.code})</option>
+                  ))}
+                </select>
+
+                <select name="classteacher" value={filters.classteacher} onChange={handleFilterChange} className="filter-select">
+                  <option value="">All Class Teachers</option>
+                  {uniqueClassTeachers.map(teacher => (
+                    <option key={teacher} value={teacher}>{teacher}</option>
+                  ))}
+                </select>
+
+                <h3>Sort By:</h3>
+                <select name="sortField" value={sortBy.field} onChange={handleSortChange} className="filter-select">
+                  <option value="">No Sort</option>
+                  <option value="name">Class Name</option>
+                  <option value="nostudent">No. of Students</option>
+                  <option value="academicYear">Academic Year</option>
+                  <option value="status">Status</option>
+                  <option value="classteacher">Class Teacher</option>
+                </select>
+
+                <select name="sortOrder" value={sortBy.order} onChange={handleSortChange} className="filter-select">
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+
+                <button onClick={clearFiltersAndSort} className="clear-filters-btn">
+                  Clear Filters & Sort
+                </button>
+              </div>
+            )}
           </div>
 
           {error ? (

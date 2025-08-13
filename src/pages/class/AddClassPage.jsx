@@ -44,7 +44,7 @@ function AddClassPage() {
     // Log an error if API_BASE_URL is not defined at startup
     useEffect(() => {
         if (!API_BASE_URL) {
-            console.error('API URL is not defined in environment variables.');
+            // console.error('API URL is not defined in environment variables.');
             setError('Configuration error: API URL is missing.');
         }
     }, [API_BASE_URL]);
@@ -62,14 +62,6 @@ function AddClassPage() {
             }
 
             try {
-                // Fetch Teachers (Uncomment this block if your backend expects a Teacher ObjectId for classteacher)
-                // const teachersResponse = await axios.get(`${API_BASE_URL}/api/v1/teacher/all`, { withCredentials: true });
-                // if (teachersResponse.data.success) {
-                //      setTeachers(teachersResponse.data.data); // Adjust 'data' path as per your API response
-                // } else {
-                //      setError(prev => prev + (prev ? '; ' : '') + (teachersResponse.data.message || 'Failed to fetch teachers.'));
-                // }
-
                 // Fetch Subjects
                 const subjectsResponse = await axios.get(`${API_BASE_URL}/api/v1/admin/getall`, { withCredentials: true });
                 if (subjectsResponse.data.status === "success") {
@@ -78,14 +70,8 @@ function AddClassPage() {
                 } else {
                     setError(prev => prev + (prev ? '; ' : '') + (subjectsResponse.data.message || 'Failed to fetch subjects.'));
                 }
-                // console.log(subjectsResponse);
-                // No longer need a delay for showSubjectsDelayed with checkboxes
-                // setTimeout(() => {
-                //     setShowSubjectsDelayed(true);
-                // }, 10000);
-
             } catch (err) {
-                console.error('Failed to fetch initial data (teachers/subjects):', err);
+                // console.error('Failed to fetch initial data (teachers/subjects):', err);
                 let errorMessage = 'Failed to load available data. Please try again.';
                 if (err.response && err.response.data && err.response.data.message) {
                     errorMessage = err.response.data.message;
@@ -187,7 +173,7 @@ function AddClassPage() {
                 setError(response.data.message || 'Failed to add class. Please try again.');
             }
         } catch (err) {
-            console.error('Add Class Error:', err);
+            // console.error('Add Class Error:', err);
 
             // Detailed error handling for Axios
             if (err.response) {

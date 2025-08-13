@@ -21,7 +21,6 @@ function GetTeacherAttendance() {
         `${API_BASE_URL}/api/v1/admin/teacher-attendance/${recordId}`,
         { withCredentials: true }
       );
-      // console.log('Delete response:', response);
       if (response.status == 200) {
         setAttendanceRecords(attendanceRecords.filter((r) => r._id !== recordId));
         setSuccess('Attendance record deleted successfully');
@@ -57,7 +56,6 @@ function GetTeacherAttendance() {
         },
         { withCredentials: true }
       );
-      // console.log('Update response:', response.status);
       if (response.status == 200) {
         setSuccess('Attendance updated successfully');
         setAttendanceRecords(attendanceRecords.map((r) =>
@@ -121,7 +119,6 @@ function GetTeacherAttendance() {
         { withCredentials: true }
       );
 
-      // console.log('Attendance response:', response);
       if (response.data.status === 200) {
         setAttendanceRecords(response.data.data);
       } else {

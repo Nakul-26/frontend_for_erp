@@ -31,7 +31,7 @@ function TeacherSidebar() {
 {/*         <Link to="/teacher/grades" data-icon="📊">Grades</Link> */}
         <Link to="/teacher/change-password" data-icon="🔒">Change Password</Link>
         <Link to="/teacher/schedule" data-icon="📅">View Schedule</Link>
-        <Link to="/teacher/settings" data-icon="⚙️">Settings</Link>
+        {/* <Link to="/teacher/settings" data-icon="⚙️">Settings</Link> */}
         <Link to="/teacher/create-attendance" data-icon="📝">Create Attendance</Link>
 {/*         <Link to="/teacher/settings" data-icon="⚙️">Settings</Link> */}
       </nav>

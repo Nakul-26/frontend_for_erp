@@ -20,8 +20,7 @@ function SubjectsPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(true);
-  const { adminData } = useAuth();
-  const navigate = useNavigate();
+  const [showFilters, setShowFilters] = useState(false);
 
   // State for Filters
   const [filters, setFilters] = useState({
@@ -78,7 +77,7 @@ function SubjectsPage() {
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to fetch subjects from backend.');
-      console.error('Fetch Subjects Error:', err);
+      // console.error('Fetch Subjects Error:', err);
     } finally {
       setLoading(false);
     }
@@ -175,7 +174,7 @@ function SubjectsPage() {
         throw new Error(response.data.message || 'Failed to delete subject');
       }
     } catch (err) {
-      console.error('Delete Subject Error:', err);
+      // console.error('Delete Subject Error:', err);
       setError(err.response?.data?.message || 'Unable to delete subject via backend.');
     }
   };
@@ -230,53 +229,62 @@ function SubjectsPage() {
             >
               {isTableView ? 'Show Card View' : 'Show Table View'}
             </button>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="login-button"
+              style={{ minWidth: '120px', fontSize: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
+            </button>
           </div>
 
           {/* Filter Controls */}
-          <div className="filter-controls" style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', border: '1px solid var(--border, #222)', borderRadius: '8px', backgroundColor: 'var(--surface, #222)' }}>
-            <h3>Filter By:</h3>
-            {/* Course Type Filter */}
-            <select name="courseType" value={filters.courseType} onChange={handleFilterChange} className="filter-select">
-              <option value="">All Course Types</option>
-              {uniqueCourseTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
+          {showFilters && (
+            <div className="filter-controls" style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', padding: '10px', border: '1px solid var(--border, #222)', borderRadius: '8px', backgroundColor: 'var(--surface, #222)' }}>
+              <h3>Filter By:</h3>
+              {/* Course Type Filter */}
+              <select name="courseType" value={filters.courseType} onChange={handleFilterChange} className="filter-select">
+                <option value="">All Course Types</option>
+                {uniqueCourseTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
 
-            {/* Status Filter */}
-            <select name="status" value={filters.status} onChange={handleFilterChange} className="filter-select">
-              <option value="">All Statuses</option>
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
+              {/* Status Filter */}
+              <select name="status" value={filters.status} onChange={handleFilterChange} className="filter-select">
+                <option value="">All Statuses</option>
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
 
-            {/* Lecture Hours Filter */}
-            <select name="lectureHours" value={filters.lectureHours} onChange={handleFilterChange} className="filter-select">
-              <option value="">All Lecture Hours</option>
-              {uniqueLectureHours.map(hours => (
-                <option key={hours} value={hours}>{hours}</option>
-              ))}
-            </select>
+              {/* Lecture Hours Filter */}
+              <select name="lectureHours" value={filters.lectureHours} onChange={handleFilterChange} className="filter-select">
+                <option value="">All Lecture Hours</option>
+                {uniqueLectureHours.map(hours => (
+                  <option key={hours} value={hours}>{hours}</option>
+                ))}
+              </select>
 
-            {/* Sort Controls */}
-            <h3>Sort By:</h3>
-            <select name="sortField" value={sortBy.field} onChange={handleSortChange} className="filter-select">
-              <option value="">No Sort</option>
-              <option value="name">Name</option>
-              <option value="code">Code</option>
-              <option value="courseType">Course Type</option>
-              <option value="lectureHours">Lecture Hours</option>
-            </select>
+              {/* Sort Controls */}
+              <h3>Sort By:</h3>
+              <select name="sortField" value={sortBy.field} onChange={handleSortChange} className="filter-select">
+                <option value="">No Sort</option>
+                <option value="name">Name</option>
+                <option value="code">Code</option>
+                <option value="courseType">Course Type</option>
+                <option value="lectureHours">Lecture Hours</option>
+              </select>
 
-            <select name="sortOrder" value={sortBy.order} onChange={handleSortChange} className="filter-select">
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
+              <select name="sortOrder" value={sortBy.order} onChange={handleSortChange} className="filter-select">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
 
-            <button onClick={clearFiltersAndSort} className="clear-filters-btn">
-              Clear Filters & Sort
-            </button>
-          </div>
+              <button onClick={clearFiltersAndSort} className="clear-filters-btn">
+                Clear Filters & Sort
+              </button>
+            </div>
+          )}
         </div>
 
         {error && (
