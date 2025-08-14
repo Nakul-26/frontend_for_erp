@@ -56,7 +56,7 @@ import GetTeacherAttendance from './pages/attendence/GetTeacherAttendance';
 import UpdateTeacherAttendance from './pages/attendence/UpdateTeacherAttendance';
 
 import TeacherChangePassword from './pages/teacher/TeacherChangePassword';
-import GetTeacherSchedule from './pages/teacher/GetTeacherSchedule';
+import GetTeacherSchedule from './pages/teacher_pages/GetTeacherSchedule';
 import CreateAttendance from './pages/teacher_pages/CreateAttendance';
 
 import './App.css';

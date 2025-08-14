@@ -30,9 +30,10 @@ function CreateAttendance() {
       setError('');
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/api/v1/teacher/my-classes`, // Assumed endpoint for teacher's classes
+          `${API_BASE_URL}/api/v1/teacher/${user._id}`,
           { withCredentials: true }
         );
+        console.log('Fetched classes:', response.data);
         if (response.data.success) {
           setClasses(response.data.data || []);
         } else {
