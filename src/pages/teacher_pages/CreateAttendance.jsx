@@ -6,119 +6,201 @@ import Navbar from '../../components/Navbar';
 import { useAuth } from '../../context/AuthContext';
 
 function CreateAttendance() {
-  const { user } = useAuth(); // Get the logged-in teacher's info
+  const { user } = useAuth();
   const API_BASE_URL = import.meta.env.VITE_API_URL;
 
   const [classes, setClasses] = useState([]);
-  const [selectedClassId, setSelectedClassId] = useState('');
+  const [subjects, setSubjects] = useState([]);
+  const [timetables, setTimetables] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
   const [students, setStudents] = useState([]);
-  const [attendanceRecords, setAttendanceRecords] = useState({}); // { studentId: { status, remarks } }
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Current date in YYYY-MM-DD format
+  const [attendanceRecords, setAttendanceRecords] = useState({});
+  //const [absentStudents, setAbsentStudents] = useState([]);
+
+  const [selectedClassId, setSelectedClassId] = useState('');
+  const [selectedTimetableId, setSelectedTimetableId] = useState('');
+  const [selectedPeriodId, setSelectedPeriodId] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
- 
-  // 1. Fetch classes assigned to the teacher
+
+  // Helper function to fetch all necessary initial data
+  const fetchInitialData = async () => {
+    if (!user?._id) return;
+    setLoading(true);
+    setError('');
+
+    try {
+      const classesRes = await axios.get(`${API_BASE_URL}/api/v1/teacher/${user._id}`, { withCredentials: true });
+
+      console.log('Classes:', classesRes.data);
+      if (classesRes.data.mapped) {
+
+        const uniqueClassIds = new Set();
+        const uniqueClasses = [];
+        
+        classesRes.data.mapped.forEach(mapping => {
+          // Check if the class ID has already been added
+          if (mapping.classId && !uniqueClassIds.has(mapping.classId._id)) {
+            uniqueClassIds.add(mapping.classId._id);
+            uniqueClasses.push(mapping.classId);
+          }
+        });
+        
+        setClasses(uniqueClasses);
+
+        classesRes.data.mapped.forEach(mapping => {
+          if (mapping.subjectId && !subjects.some(sub => sub._id === mapping.subjectId._id)) {
+            setSubjects(prevSubjects => [...prevSubjects, mapping.subjectId]);
+            // console.log('Subject added:', mapping.subjectId);
+          }
+        });
+        // console.log('Unique Classes:', uniqueClasses);
+
+      } else {
+        throw new Error('Failed to fetch classes.');
+      }
+
+      // Fetch all time slots
+      const timeSlotsRes = await axios.get(`${API_BASE_URL}/api/v1/teacher/getallslots`, { withCredentials: true });
+      console.log('Time Slots:', timeSlotsRes.data);
+      if (timeSlotsRes.data) {
+        setTimeSlots(timeSlotsRes.data);
+      } else {
+        throw new Error('Failed to fetch time slots.');
+      }
+
+
+
+    } catch (err) {
+      setError('Failed to load initial data.');
+      console.error('Error fetching initial data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch initial data on component mount
   useEffect(() => {
-    const fetchTeacherClasses = async () => {
-      if (!user?.id) {
-        setError('User not authenticated. Please log in.');
+    fetchInitialData();
+  }, [user?._id, API_BASE_URL]);
+
+  // Fetch timetables when a class is selected
+  useEffect(() => {
+    const fetchTimetables = async () => {
+      if (!selectedClassId) {
+        setTimetables([]);
+        setSelectedTimetableId('');
+        setSelectedPeriodId('');
         return;
       }
-      setLoading(true);
-      setError('');
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/api/v1/teacher/${user._id}`,
-          { withCredentials: true }
-        );
-        console.log('Fetched classes:', response.data);
-        if (response.data.success) {
-          setClasses(response.data.data || []);
-        } else {
-          throw new Error('Failed to fetch classes.');
-        }
+        setLoading(true);
+        const res = await axios.get(`${API_BASE_URL}/api/v1/teacher/getalldailyschedules/${selectedClassId}`, { withCredentials: true });
+        console.log('Fetched Timetables:', res.data.data);
+        setTimetables(res.data.data || []);
       } catch (err) {
-        // console.error('Error fetching teacher classes:', err);
-        setError('Failed to load your classes. Please try again.');
-        setClasses([]);
+        setError('Failed to fetch timetables for the selected class.');
       } finally {
         setLoading(false);
       }
     };
-    fetchTeacherClasses();
-  }, [user?._id, API_BASE_URL]);
+    fetchTimetables();
+  }, [selectedClassId, API_BASE_URL]);
 
-  // 2. Fetch students and existing attendance for the selected class and date
+  // Fetch students and existing attendance when class, date, and period are selected
+  // useEffect(() => {
+  //   const fetchStudentsAndAttendance = async () => {
+  //     if (!selectedClassId || !date || !selectedPeriodId) {
+  //       setStudents([]);
+  //       setAttendanceRecords({});
+  //       return;
+  //     }
+  //     setLoading(true);
+  //     setError('');
+  //     setSuccess('');
+  //     try {
+  //       const studentsResponse = await axios.get(`${API_BASE_URL}/api/v1/teacher/classes/${selectedClassId}/students`, { withCredentials: true });
+  //       if (studentsResponse.data.success) {
+  //         const fetchedStudents = studentsResponse.data.data;
+  //         setStudents(fetchedStudents);
+
+  //         const initialAttendance = {};
+  //         fetchedStudents.forEach(student => {
+  //           initialAttendance[student._id] = { status: 'present', remarks: '' };
+  //         });
+  //         setAttendanceRecords(initialAttendance);
+
+  //         const existingAttendanceResponse = await axios.get(`${API_BASE_URL}/api/v1/teacher/attendance/${selectedClassId}/${date}/${selectedPeriodId}`, { withCredentials: true });
+  //         if (existingAttendanceResponse.data.success && existingAttendanceResponse.data.data.length > 0) {
+  //           const existingRecords = existingAttendanceResponse.data.data;
+  //           const updatedAttendance = { ...initialAttendance };
+  //           existingRecords.forEach(record => {
+  //             updatedAttendance[record.studentId] = {
+  //               status: record.status,
+  //               remarks: record.remarks || ''
+  //             };
+  //           });
+  //           setAttendanceRecords(updatedAttendance);
+  //         }
+  //       } else {
+  //         throw new Error('Failed to fetch students.');
+  //       }
+  //     } catch (err) {
+  //       setError('Failed to load students or attendance for this class and period.');
+  //       setStudents([]);
+  //       setAttendanceRecords({});
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchStudentsAndAttendance();
+  // }, [selectedClassId, date, selectedPeriodId, API_BASE_URL]);
+
+
+  //fetch all students when class is selected
   useEffect(() => {
-    const fetchStudentsAndAttendance = async () => {
-      if (!selectedClassId || !date) {
+    const fetchStudents = async () => {
+      if (!selectedClassId) {
         setStudents([]);
         setAttendanceRecords({});
         return;
       }
-
       setLoading(true);
       setError('');
       setSuccess('');
       try {
-        // Fetch students in the selected class
-        const studentsResponse = await axios.get(
-          `${API_BASE_URL}/api/v1/teacher/classes/${selectedClassId}/students`, // Assumed endpoint
-          { withCredentials: true }
-        );
-
+        const studentsResponse = await axios.get(`${API_BASE_URL}/api/v1/teacher/class/${selectedClassId}/students`, { withCredentials: true });
+        console.log('Fetched Students:', studentsResponse.data);
         if (studentsResponse.data.success) {
           const fetchedStudents = studentsResponse.data.data;
           setStudents(fetchedStudents);
-
-          // Initialize attendance records for all fetched students as absent by default
           const initialAttendance = {};
           fetchedStudents.forEach(student => {
-            initialAttendance[student._id] = { status: 'absent', remarks: '' };
+            initialAttendance[student._id] = { status: 'present', remarks: '' };
           });
           setAttendanceRecords(initialAttendance);
-
-          // Try to fetch existing attendance for pre-filling
-          const existingAttendanceResponse = await axios.get(
-            `${API_BASE_URL}/api/v1/teacher/attendance/${selectedClassId}/${date}`, // Assumed endpoint
-            { withCredentials: true }
-          );
-
-          if (existingAttendanceResponse.data.success && existingAttendanceResponse.data.data.length > 0) {
-            const existingRecords = existingAttendanceResponse.data.data;
-            const updatedAttendance = { ...initialAttendance };
-            existingRecords.forEach(record => {
-              if (updatedAttendance[record.studentId]) { // Ensure student exists
-                updatedAttendance[record.studentId] = {
-                  status: record.status,
-                  remarks: record.remarks || ''
-                };
-              }
-            });
-            setAttendanceRecords(updatedAttendance);
-          }
         } else {
           throw new Error('Failed to fetch students.');
         }
       } catch (err) {
-        // console.error('Error fetching students or attendance:', err);
-        setError('Failed to load students or attendance for this class.');
+        setError('Failed to load students for this class.');
         setStudents([]);
         setAttendanceRecords({});
       } finally {
         setLoading(false);
       }
     };
+    fetchStudents();
+  }, [selectedClassId, API_BASE_URL]);
 
-    fetchStudentsAndAttendance();
-  }, [selectedClassId, date, API_BASE_URL]);
 
   const handleClassChange = (e) => {
     setSelectedClassId(e.target.value);
-    setStudents([]); // Clear students when class changes
-    setAttendanceRecords({}); // Clear attendance records
+    setSelectedTimetableId('');
+    setSelectedPeriodId('');
   };
 
   const handleAttendanceChange = (studentId, field, value) => {
@@ -129,6 +211,17 @@ function CreateAttendance() {
         [field]: value,
       },
     }));
+
+    // setAbsentStudents(prevAbsent => {
+    //   if (field === 'status') {     
+    //     if (value === 'absent' && !prevAbsent.includes(studentId)) {
+    //       return [...prevAbsent, studentId];
+    //     } else if (value !== 'absent' && prevAbsent.includes(studentId)) {
+    //       return prevAbsent.filter(id => id !== studentId);
+    //     }
+    //   }
+    //   return prevAbsent;
+    // });
   };
 
   const handleSubmitAttendance = async (e) => {
@@ -137,47 +230,52 @@ function CreateAttendance() {
     setSuccess('');
     setLoading(true);
 
-    if (!selectedClassId || students.length === 0) {
-      setError('Please select a class and ensure students are loaded.');
+    if (!selectedClassId || !selectedTimetableId || !selectedPeriodId) {
+      setError('Please select a class, timetable, and period.');
       setLoading(false);
       return;
     }
 
-    const attendancePayload = students.map(student => ({
-      studentId: student._id,
-      status: attendanceRecords[student._id]?.status || 'absent', // Default to absent if not marked
-      remarks: attendanceRecords[student._id]?.remarks || '',
-    }));
+    // Filter for absent students and map their MongoDB _ids
+    // The attendanceRecords state uses student._id as the key, so we must use that here.
+    const absentStudents = students
+      .filter(student => attendanceRecords[student.rollno]?.status === 'absent') // <-- CORRECTED
+      .map(student => student.rollno); // <-- This should also use _id, not rollno, to match backend validation
+
+    const attendancePayload = {
+      classId: selectedClassId,
+      date: date,
+      absent: absentStudents, // <-- CORRECTED: This should be the direct array of IDs
+      timetableId: selectedTimetableId,
+      period: selectedPeriodId,
+      markedBy: user._id
+    };
+
+    console.log('Attendance Payload:', attendancePayload);
 
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/api/v1/teacher/attendance`, // Assumed endpoint for marking student attendance
-        {
-          classId: selectedClassId,
-          date: date,
-          attendance: attendancePayload,
-        },
+        `${API_BASE_URL}/api/v1/attendance/create`,
+        attendancePayload,
         { withCredentials: true }
       );
 
+      console.log('4Attendance Response:', response.data);
+
       if (response.data.success) {
-        setSuccess('Student attendance marked successfully!');
-        // Optionally, clear form or navigate
-        // setSelectedClassId('');
-        // setStudents([]);
-        // setAttendanceRecords({});
+        setSuccess('3Student attendance marked successfully!');
       } else {
-        throw new Error(response.data.message || 'Failed to mark attendance.');
+        throw new Error(response.data.message);
       }
     } catch (err) {
-      // console.error('Error submitting attendance:', err);
-      const errorMessage = err.response?.data?.error?.errors?.[0] || 'Failed to mark attendance. Please try again.';
-      setError(errorMessage);
+      console.error('!!!!Error marking attendance:', err);
+      const errorMessage = err.response?.data?.error?.errors?.[0]?.message || err.response?.data?.message || '2Failed to mark attendance. Please try again.';
+      setError("1"+errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
+  
   return (
     <div className="dashboard-container">
       <TeacherSidebar />
@@ -186,7 +284,7 @@ function CreateAttendance() {
         <div className="form-container" style={{ width: '100%', maxWidth: '100%', margin: '0 auto', background: 'var(--surface)', padding: 32, borderRadius: 12, boxShadow: '0 2px 8px var(--border-color)' }}>
           <h2 style={{ marginBottom: 24, color: 'var(--primary)', fontWeight: 700 }}>Mark Student Attendance</h2>
           <form onSubmit={handleSubmitAttendance}>
-            <div style={{ marginBottom: '20px', display: 'flex', gap: '20px', alignItems: 'center' }}>
+            <div style={{ marginBottom: '20px', display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center' }}>
               <div>
                 <label htmlFor="date-select" style={{ marginRight: '10px', fontWeight: 500 }}>Date:</label>
                 <input
@@ -198,6 +296,7 @@ function CreateAttendance() {
                   style={{ padding: '8px', borderRadius: 6, border: '1px solid var(--border-color)', background: 'var(--input-background)', color: 'var(--input-text)' }}
                 />
               </div>
+
               <div>
                 <label htmlFor="class-select" style={{ marginRight: '10px', fontWeight: 500 }}>Select Class:</label>
                 <select
@@ -210,24 +309,68 @@ function CreateAttendance() {
                   <option value="">-- Select Class --</option>
                   {classes.map(cls => (
                     <option key={cls._id} value={cls._id}>
-                      {cls.name}
+                      {cls.classId} ({cls.section})
                     </option>
                   ))}
                 </select>
               </div>
+              {timetables.length > 0 && (
+                <div>
+                  <label htmlFor="timetable-select" style={{ marginRight: '10px', fontWeight: 500 }}>Select Timetable:</label>
+                  <select
+                    id="timetable-select"
+                    value={selectedTimetableId}
+                    onChange={(e) => setSelectedTimetableId(e.target.value)}
+                    required
+                    style={{ padding: '8px', borderRadius: 6, border: '1px solid var(--border-color)', minWidth: 180, background: 'var(--input-background)', color: 'var(--input-text)' }}
+                  >
+                    <option value="">-- Select Timetable --</option>
+                    {timetables.map(tt => (
+                      <option key={tt._id} value={tt._id}>
+                        Daily Schedule for {tt.day}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {selectedTimetableId && (
+                <div>
+                  <label htmlFor="period-select" style={{ marginRight: '10px', fontWeight: 500 }}>Select Period:</label>
+                  <select
+                    id="period-select"
+                    value={selectedPeriodId}
+                    onChange={(e) => setSelectedPeriodId(e.target.value)}
+                    required
+                    style={{ padding: '8px', borderRadius: 6, border: '1px solid var(--border-color)', minWidth: 180, background: 'var(--input-background)', color: 'var(--input-text)' }}
+                  >
+                    <option value="">-- Select Period --</option>
+                    {/* {timetables.find(tt => tt._id === selectedTimetableId)?.periods.map(period => {
+                      const timeSlot = timeSlots.find(slot => slot._id === period.periodId);
+                      return (
+                        <option key={period._id} value={period.periodId}>
+                          {timeSlot?.period} ({timeSlot?.startTime} - {timeSlot?.endTime})
+                        </option>
+                      );
+                    })} */}
+                    {timeSlots
+                      .filter(ts => !ts.period.toLowerCase().includes("break"))
+                      .map(slot => (
+                        <option key={slot._id} value={slot._id}>
+                          {slot.period} ({slot.startTime} - {slot.endTime})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             {loading && <p style={{ textAlign: 'center', fontSize: '18px', color: 'var(--text-muted, #666)' }}>Loading...</p>}
             {error && <div className="error-message" style={{ color: 'var(--danger)', textAlign: 'center', marginBottom: '20px' }}>{error}</div>}
             {success && <div className="success-message" style={{ color: 'var(--success)', textAlign: 'center', marginBottom: '20px' }}>{success}</div>}
 
-            {selectedClassId && !loading && students.length === 0 && !error && (
-              <p style={{ textAlign: 'center', fontSize: '18px', color: 'var(--text-muted, #666)' }}>No students found for this class or date.</p>
-            )}
-
             {students.length > 0 && !loading && (
               <div style={{ marginTop: '30px' }}>
-                <h3 style={{ marginBottom: '15px', color: 'var(--text)', fontWeight: 600 }}>Students in {classes.find(cls => cls._id === selectedClassId)?.name}</h3>
+                <h3 style={{ marginBottom: '15px', color: 'var(--text)', fontWeight: 600 }}>Students in {classes.find(cls => cls._id === selectedClassId)?.classId}</h3>
                 <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid var(--border-color)', borderRadius: '8px', padding: '15px', background: 'var(--card-background)' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text)' }}>
                     <thead>
@@ -240,13 +383,13 @@ function CreateAttendance() {
                     </thead>
                     <tbody>
                       {students.map((student) => (
-                        <tr key={student._id} style={{ borderBottom: '1px solid var(--border-color-light)' }}>
-                          <td style={{ padding: '10px' }}>{student.studentId}</td>
+                        <tr key={student.rollno} style={{ borderBottom: '1px solid var(--border-color-light)' }}>
+                          <td style={{ padding: '10px' }}>{student.rollno}</td>
                           <td style={{ padding: '10px' }}>{student.name}</td>
                           <td style={{ padding: '10px', textAlign: 'center' }}>
                             <select
-                              value={attendanceRecords[student._id]?.status || 'absent'}
-                              onChange={(e) => handleAttendanceChange(student._id, 'status', e.target.value)}
+                              value={attendanceRecords[student.rollno]?.status || 'present'}
+                              onChange={(e) => handleAttendanceChange(student.rollno, 'status', e.target.value)}
                               style={{ padding: '6px', borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--input-background)', color: 'var(--input-text)' }}
                             >
                               <option value="present">Present</option>
@@ -257,8 +400,8 @@ function CreateAttendance() {
                           <td style={{ padding: '10px' }}>
                             <input
                               type="text"
-                              value={attendanceRecords[student._id]?.remarks || ''}
-                              onChange={(e) => handleAttendanceChange(student._id, 'remarks', e.target.value)}
+                              value={attendanceRecords[student.rollno]?.remarks || ''}
+                              onChange={(e) => handleAttendanceChange(student.rollno, 'remarks', e.target.value)}
                               placeholder="Remarks"
                               style={{ padding: '6px', borderRadius: 4, border: '1px solid var(--border-color)', width: '100%', background: 'var(--input-background)', color: 'var(--input-text)' }}
                             />
@@ -270,13 +413,16 @@ function CreateAttendance() {
                 </div>
                 <button
                   type="submit"
-                  className="login-button" // Reusing login-button style
+                  className="login-button"
                   style={{ marginTop: '25px', padding: '12px 25px', background: 'var(--primary)', color: 'var(--text-light)', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
                   disabled={loading || students.length === 0}
                 >
                   {loading ? 'Submitting...' : 'Submit Attendance'}
                 </button>
               </div>
+            )}
+            {selectedClassId && !loading && students.length === 0 && !error && (
+              <p style={{ textAlign: 'center', fontSize: '18px', color: 'var(--text-muted, #666)' }}>No students found for this class.</p>
             )}
           </form>
         </div>

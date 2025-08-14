@@ -194,55 +194,55 @@ select:disabled, select option:disabled {
 
 /* Schedule Table Container */
 .schedule-table-container {
-    overflow-x: auto; /* Adds horizontal scroll for small screens */
-    margin-top: 20px;
+  overflow-x: auto; /* Adds horizontal scroll for small screens */
+  margin-top: 20px;
 }
 
 /* Main Table Styling */
 .schedule-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .schedule-table th, .schedule-table td {
-    border: 1px solid #e0e0e0;
-    padding: 12px 8px;
-    min-width: 120px; /* Ensures columns have a minimum width */
+  border: 1px solid #e0e0e0;
+  padding: 12px 8px;
+  min-width: 120px; /* Ensures columns have a minimum width */
 }
 
 .schedule-table thead {
-    background-color: #007bff;
-    color: white;
+  background-color: #007bff;
+  color: white;
 }
 
 .schedule-table th {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .schedule-table tbody tr:nth-child(even) {
-    background-color: #f8f9fa; /* Zebra striping for better readability */
+  background-color: #f8f9fa; /* Zebra striping for better readability */
 }
 
 .schedule-table tbody tr:hover {
-    background-color: #e9ecef;
+  background-color: #e9ecef;
 }
 
 /* Cell Content Styling */
 .subject-name {
-    font-weight: bold;
-    color: #333;
+  font-weight: bold;
+  color: #333;
 }
 
 .class-id {
-    font-size: 0.85em;
-    color: #666;
-    margin-top: 5px;
+  font-size: 0.85em;
+  color: #666;
+  margin-top: 5px;
 }
 
 .empty-slot {
-    color: #999;
-    font-style: italic;
+  color: #999;
+  font-style: italic;
 }

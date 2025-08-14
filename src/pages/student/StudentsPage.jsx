@@ -19,6 +19,9 @@ function StudentsPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 900);
   const [isTableView, setIsTableView] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [allClasses, setAllClasses] = useState([]);
+  const [selectedClassId, setSelectedClassId] = useState('');
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
   
   // State for Filters
   const [filters, setFilters] = useState({
@@ -26,6 +29,23 @@ function StudentsPage() {
     status: '',
     admissionYear: ''
   });
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      // You'll need an API endpoint to get all classes.
+      // Assuming an endpoint like: /api/v1/admin/getallclasses
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/v1/admin/getallclass`, { withCredentials: true });
+        console.log('Fetched Classes:', res.data);
+        if (res.data.success) {
+          setAllClasses(res.data.data);
+        }
+      } catch (err) {
+        setError('Failed to fetch classes.');
+      }
+    };
+    fetchClasses();
+  }, [API_BASE_URL]);
 
   // State for Sorting
   const [sortBy, setSortBy] = useState({ field: '', order: 'asc' });
@@ -45,41 +65,44 @@ function StudentsPage() {
   }, []);
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      setError('');
-      setLoading(true);
-      const API_BASE_URL = import.meta.env.VITE_API_URL;
+  const fetchStudents = async () => {
+    if (!selectedClassId) {
+      setStudents([]); // Clear students if no class is selected
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const response = await axios.get(
-          `${API_BASE_URL}/api/v1/admin/getallstudents`,
-          { withCredentials: true }
-        );
-        if (response.data.success) {
-          setStudents(response.data.data);
-          // Extract unique filter options
-          const years = [...new Set(response.data.data
-            .map(student => new Date(student.dateOfAdmission).getFullYear())
-            .filter(Boolean))].sort();
-          setUniqueAdmissionYears(['', ...years]);
+    setError('');
+    setLoading(true);
+    const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-          const classes = [...new Set(response.data.data
-            .map(student => student.class)
-            .filter(Boolean))].sort();
-          setUniqueClasses(['', ...classes]);
-        } else {
-          throw new Error('Failed to fetch students');
-        }
-      } catch (err) {
-        setError('Unable to fetch students from backend.');
-        // console.error('Fetch Students Error:', err);
-      } finally {
-        setLoading(false);
+    try {
+      // Pass the selectedClassId to the API
+      const response = await axios.get(
+        `${API_BASE_URL}/api/v1/admin/getallstudents/${selectedClassId}`,
+        { withCredentials: true }
+      );
+      console.log('Fetched Students:', response.data);
+      console.log('selectedClassId:', selectedClassId);
+
+      if (response.data.success) {
+        setStudents(response.data.data);
+        // Extract unique classes and admission years for filters
+        const classes = [...new Set(response.data.data.map(student => student.class))]; 
+        const admissionYears = [...new Set(response.data.data.map(student => new Date(student.dateOfAdmission).getFullYear().toString()))];
+        setUniqueClasses(classes);
+        setUniqueAdmissionYears(admissionYears);
+      } else {
+        setError('Failed to fetch students. Please try again later.');
       }
-    };
+    } catch (err) {
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchStudents();
-  }, []);
+  fetchStudents();
+}, [selectedClassId, API_BASE_URL]); // Trigger fetch when selectedClassId changes
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -269,6 +292,15 @@ function StudentsPage() {
           </div>
         )}
 
+        <div>
+          <select name="class" value={selectedClassId} onChange={(e) => setSelectedClassId(e.target.value)} className="filter-select">
+            <option value="">All Classes</option>
+            {allClasses.map(cls => (
+              <option key={cls._id} value={cls._id}>{cls.name}</option>
+            ))}
+          </select>
+        </div>
+
         {loading ? (
           <div style={{ textAlign: 'center', fontSize: '18px', color: '#666' }}>Loading...</div>
         ) : filteredAndSortedStudents.length === 0 ? (
@@ -281,9 +313,11 @@ function StudentsPage() {
           ) : (
             <div className="cards-grid">
               {filteredAndSortedStudents.map((student) => (
-                <StudentCard
-                  key={student.s_id}
+                console.log('Rendering StudentCard for:', student),
+                <StudentCard 
+                  key={student.rollno}
                   student={student}
+                  classId={allClasses.find(cls => cls._id === selectedClassId).classId}
                   onDelete={handleDeleteStudent}
                 />
               ))}

@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/Card.css';
 
-function StudentCard({ student, onDelete }) {
+function StudentCard({ student, classId, onDelete }) {
+
+  console.log('Rendering selectedClassId for:', classId);
   const navigate = useNavigate();
   const API_BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -45,41 +47,41 @@ function StudentCard({ student, onDelete }) {
       </div>
       <div className="card-body">
         <p className="card-id">
-          <strong>Student ID:</strong> <span>{getValue(student.s_id)}</span>
+          <strong>Student ID:</strong> <span>{getValue(student.rollno)}</span>
         </p>
         <p className="card-info">
           <strong>Email:</strong> <span>{getValue(student.email)}</span>
         </p>
         <p className="card-info">
-          <strong>Age:</strong> <span>{getValue(student.Age)}</span>
+          <strong>Age:</strong> <span>{getValue(student.age)}</span>
         </p>
         <p className="card-info">
           <strong>Phone:</strong> <span>{getValue(student.phone)}</span>
         </p>
         <p className="card-info">
-          <strong>Date of Birth:</strong> <span>{getValue(student.dateOfBirth)}</span>
+          <strong>Date of Birth:</strong> <span>{getValue(student.dateofbirth)}</span>
         </p>
         <p className="card-info">
-          <strong>Date of Admission:</strong> <span>{getValue(student.dateOfAdmission)}</span>
+          <strong>Date of Admission:</strong> <span>{getValue(student.dateofadmission)}</span>
         </p>
         <p className="card-info">
-          <strong>Class:</strong> <span>{getValue(student.class?.name || student.class)}</span>
+          <strong>Class:</strong> <span>{getValue(classId)}</span>
         </p>
         <p className="card-info">
           <strong>Father's Name:</strong> <span>{getValue(student.fatherName)}</span>
         </p>
         <p className="card-info">
-          <strong>Father's Phone:</strong> <span>{getValue(student.fatherPhoneNumber)}</span>
+          <strong>Father's Occupation:</strong> <span>{getValue(student.fatherOccupation)}</span>
         </p>
         <p className="card-info">
           <strong>Mother's Name:</strong> <span>{getValue(student.motherName)}</span>
         </p>
         <p className="card-info">
-          <strong>Mother's Phone:</strong> <span>{getValue(student.motherPhoneNumber)}</span>
+          <strong>Mother's Occupation:</strong> <span>{getValue(student.motherOccupation)}</span>
         </p>
-        <p className="card-info">
+        {/* <p className="card-info">
           <strong>Qualification:</strong> <span>{getValue(student.Qualification)}</span>
-        </p>
+        </p> */}
       </div>
       <div className="card-footer">
         <button

@@ -53,7 +53,7 @@ function TeacherDashboard() {
     <div className="dashboard-container">
       <TeacherSidebar teacherData={teacherData} />
       <main className="main-content">
-        <Navbar />
+        <Navbar pageTitle={"Dashboard"} />
         <div className="stats-grid">
           {stats.map((stat, index) => (
             <div key={index} className="stat-card">
