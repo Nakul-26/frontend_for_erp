@@ -147,13 +147,18 @@ function CreateTimetablePage() {
       for (const slot of timeSlots) {
         if (!isBreakPeriod(slot.period)) {
           const cell = grid[day]?.[slot._id] || {};
+          console.log("cell:");
+          console.log(cell);
           if (!cell.combo) {
-            setLoading(false);
-            setError(`Please select a subject-teacher pair for ${day}, ${slot.period}`);
-            return;
+            // setLoading(false);
+            // setError(`Please select a subject-teacher pair for ${day}, ${slot.period}`);
+            continue;
           }
           const found = mappedPairs.find(m => m._id === cell.combo);
-          if (!found || !found._id) {
+
+          console.log("found:");
+          console.log(found);
+          if (!found._id) {
             setLoading(false);
             setError(`Invalid mapping for ${day}, ${slot.period}. Please select a valid subject-teacher pair.`);
             return;
@@ -169,7 +174,7 @@ function CreateTimetablePage() {
           .filter(slot => !isBreakPeriod(slot.period))
           .map(slot => {
             const cell = grid[day]?.[slot._id] || {};
-            let mappedId = '';
+            let mappedId = null;
             if (cell.combo) {
               mappedId = cell.combo;
             }
@@ -182,7 +187,9 @@ function CreateTimetablePage() {
           day,
           periods
         };
-        await axios.post(`${API_BASE_URL}/api/v1/admin/createdailyschedule/${selectedClass}`, payload, { withCredentials: true });
+        console.log("payload for day " + day + ":");
+        await axios.post(`${API_BASE_URL}/api/v1/admin/createdailyschedule/${selectedClass}`, payload, { withCredentials: true })
+        .then(res => {console.log(res.data);});
       }
       setSuccess('Timetable created successfully!');
     } catch (err) {
