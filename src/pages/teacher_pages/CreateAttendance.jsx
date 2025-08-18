@@ -87,6 +87,12 @@ function CreateAttendance() {
         const res2 = await axios.get(`${API_BASE_URL}/api/v1/teacher/getalldailyschedules/${selectedClassId}`, { withCredentials: true });
         console.log('Fetched Timetables:', res2);
         setTimetables(res2.data.data);
+
+        console.log('Selected timetables:', timetables);
+        const requiredTimetable = timetables.find(tt => tt.day.toLowerCase() === selectedDay.toLowerCase());
+        console.log('Required Timetable:', requiredTimetable);
+        setSelectedTimetableId(requiredTimetable._id);
+
       } catch (err) {
         setError('Failed to fetch timetables for the selected class.');
       } finally {
@@ -96,7 +102,7 @@ function CreateAttendance() {
     };
     fetchTimetables();
     
-  }, [selectedClassId, API_BASE_URL]);
+  }, [selectedClassId, API_BASE_URL, selectedDay, timetables]);
 
   useEffect(() => {
     const filterTimetables = () => {
@@ -186,6 +192,11 @@ function CreateAttendance() {
     setSuccess('');
     setLoading(true);
 
+
+    
+
+    console.log('Submitting Attendance Records:', selectedPeriodId);
+
     if (!selectedClassId || !selectedTimetableId || !selectedPeriodId) {
       setError('Please select a class, timetable, and period.');
       setLoading(false);
@@ -200,7 +211,7 @@ function CreateAttendance() {
 
     const attendancePayload = {
       classId: selectedClassId,
-      date: date,
+      date: formatted,
       absent: absentStudents, // <-- CORRECTED: This should be the direct array of IDs
       timetableId: selectedTimetableId,
       period: selectedPeriodId,
@@ -280,7 +291,7 @@ function CreateAttendance() {
                     id="timetable-select" 
                     value={todayName}
                     onChange={(e) => {
-                      setSelectedTimetableId(e.target.value)
+                      // setSelectedTimetableId(e.target.value)
                       setSelectedDay(e.target.value)
                     }}
                     required
@@ -302,7 +313,7 @@ function CreateAttendance() {
                   >
                     <option value="">-- Select Period --</option>
                       {todayClasses.map(tc => 
-                        <option key={tc._id} value="tc._id">{tc.period}</option>
+                        <option key={tc._id} value={tc._id}>{tc.period}</option>
                       )}
                   </select>
                 </div>
