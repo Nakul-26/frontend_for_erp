@@ -16,6 +16,37 @@ function GetTeacherSchedule() {
   const [subject, setSubject] = useState('');
   const [classinfo, setClassinfo] = useState({});
 
+  // Utility to normalize AM/PM time to minutes
+  const parseTime = (timeStr) => {
+    if (!timeStr) return 0;
+    let [time, modifier] = timeStr.split(" "); // e.g. "9:50 AM"
+    let [hours, minutes] = time.split(":").map(Number);
+
+    if (modifier === "PM" && hours !== 12) hours += 12;
+    if (modifier === "AM" && hours === 12) hours = 0;
+
+    return hours * 60 + minutes;
+  };
+
+  // Main function: sort schedule by day and periods
+  function sortTeacherSchedule(schedule, timeSlots) {
+    const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    // Create lookup for slot order by startTime
+    const slotOrder = [...timeSlots]
+      .sort((a, b) => parseTime(a.startTime) - parseTime(b.startTime))
+      .map(slot => slot._id);
+
+    return [...schedule]
+      .sort((a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day)) // sort days
+      .map(dayEntry => ({
+        ...dayEntry,
+        periods: [...dayEntry.periods].sort(
+          (a, b) => slotOrder.indexOf(a.period) - slotOrder.indexOf(b.period)
+        )
+      }));
+  }
+
   const fetchTeacherSchedule = async () => {
     if (!user?._id) {
       setError('User ID not found. Please log in again.');
@@ -28,8 +59,13 @@ function GetTeacherSchedule() {
         `${API_BASE_URL}/api/v1/teacher/schedule/${user._id}`,
         { withCredentials: true }
       );
-      console.log('Fetched teacher schedule:', response.data.data);
-      setSchedule(response.data.data);
+      let data = response.data.data;
+
+      // Sort days + periods using timeSlots
+      data = sortTeacherSchedule(data, timeSlots);
+
+      console.log('Sorted teacher schedule:', data);
+      setSchedule(data);
     } catch (err) {
       console.error('Failed to fetch teacher schedule:', err);
       setError('Failed to fetch your schedule. Please try again.');
@@ -38,7 +74,8 @@ function GetTeacherSchedule() {
     }
   };
 
-    const fetchTimeSlots = async () => {
+
+  const fetchTimeSlots = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/api/v1/teacher/getallslots`, { withCredentials: true });
       console.log('Time slots fetched:', res.data);
@@ -88,8 +125,6 @@ function GetTeacherSchedule() {
       return <p>No schedule found.</p>;
     }
 
-    console.log('timeSlots:', timeSlots);
-
     // Create a time slot map for quick lookup
     const timeSlotMap = timeSlots.reduce((map, slot) => {
       map[slot._id] = slot;
@@ -102,11 +137,9 @@ function GetTeacherSchedule() {
         return map;
     }, {});
 
-    // Extract period names for the table header from the first day
-    const periodsHeader = schedule[0].periods.map(period => {
-        const timeSlot = timeSlotMap[period.period];
-        return timeSlot ? timeSlot.period : '';
-    });
+    // Use the complete list of time slots to create the table's columns
+    const allTimeSlots = timeSlots.filter(ts => !ts.period.toLowerCase().includes("break"));
+    // console.log('All time slots:', timeSlots);
 
     return (
         <div className="schedule-table-container">
@@ -114,21 +147,38 @@ function GetTeacherSchedule() {
                 <thead>
                     <tr>
                         <th>Day</th>
-                        {periodsHeader.map((periodName, index) => (
-                            <th key={index}>{periodName}</th>
+                        {allTimeSlots.map(slot => (
+                            <th key={slot._id}>
+                              <div>
+                                {slot.period}
+                              </div>
+                              <div>
+                                {slot.startTime} to {slot.endTime}
+                              </div>
+                            </th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {schedule.map((dayEntry) => (
+                    {schedule.map(dayEntry => (
+                        // console.log('Day Entry:', dayEntry),
                         <tr key={dayEntry._id}>
-                            <td>{dayEntry.day}</td>
-                            {dayEntry.periods.map((periodEntry) => {
-                                const mappedInfo = mappedInfoMap[periodEntry.mapped];
+                            <td>{dayEntry.day}</td> 
+                            {/* The inner loop now iterates through all available time slots */}
+                            {allTimeSlots.map(timeSlot => {
+                                // console.log('Time Slot:', timeSlot);
+                                // Find the matching period entry from the fetched data
+                                const periodEntry = dayEntry.periods.find(p => p.period === timeSlot._id);
+                                // console.log('Period Entry:', dayEntry.periods, periodEntry);
+                                
+                                // Get the mapped info if an entry exists
+                                const mappedInfo = periodEntry ? mappedInfoMap[periodEntry.mapped] : null;
+                                
+                                // Check if the teacher is assigned to this period
                                 const isTeacherAssigned = mappedInfo?.teacherId === user._id;
 
                                 return (
-                                    <td key={periodEntry._id}>
+                                    <td key={timeSlot._id}>
                                         {isTeacherAssigned && mappedInfo ? (
                                             <>
                                                 <div className="subject-name">{mappedInfo.subjectId.name}</div>
@@ -147,12 +197,6 @@ function GetTeacherSchedule() {
         </div>
     );
 };
-
-
-    
-
-
-
 
 
   useEffect(() => {

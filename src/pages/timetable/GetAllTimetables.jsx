@@ -19,6 +19,34 @@ function GetAllTimetables() {
       .catch(() => setClasses([]));
   }, []);
 
+
+  // 1. Sort timetables by day
+  function sortByDay(timetables) {
+    const dayOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    return [...timetables].sort(
+      (a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day)
+    );
+  }
+
+  // 2. Sort periods inside each timetable by startTime
+  function sortPeriodsInTimetables(timetables) {
+    return timetables.map(tt => ({
+      ...tt,
+      periods: [...(tt.periods || [])].sort((a, b) => {
+        const parseTime = (timeStr) => {
+          if (!timeStr) return 0;
+          let [time, modifier] = timeStr.split(" "); // "10:50 AM" -> ["10:50", "AM"]
+          let [hours, minutes] = time.split(":").map(Number);
+          if (modifier === "PM" && hours !== 12) hours += 12;
+          if (modifier === "AM" && hours === 12) hours = 0;
+          return hours * 60 + minutes; // convert to minutes since midnight
+        };
+        return parseTime(a.period?.startTime) - parseTime(b.period?.startTime);
+      })
+    }));
+  }
+
   const fetchTimetables = async (classId) => {
     if (!classId) return;
     setLoading(true);
@@ -26,7 +54,27 @@ function GetAllTimetables() {
     setTimetables([]);
     try {
       const res = await axios.get(`${API_BASE_URL}/api/v1/admin/getalldailyschedules/${classId}`, { withCredentials: true });
+      console.log('Fetched timetables:', res.data.data);
       setTimetables(res.data.data || []);
+    } catch (err) {
+      setError('Failed to fetch timetables.');
+    } finally {
+      setLoading(false);
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+
+      const res = await axios.get(`${API_BASE_URL}/api/v1/admin/getalldailyschedules/${classId}`, { withCredentials: true });
+      let data = res.data.data || [];
+
+      // Sort timetables and periods
+      data = sortByDay(data);
+      data = sortPeriodsInTimetables(data);
+
+      console.log("Sorted timetables:", data);
+      setTimetables(data);
     } catch (err) {
       setError('Failed to fetch timetables.');
     } finally {
@@ -94,10 +142,12 @@ function GetAllTimetables() {
                             }
                           });
                         });
-                        return allPeriods.map(slot => (
+                        return allPeriods.map((slot, index) => (
                           <th key={slot?._id}>
-                            {slot?.period}<br />
-                            <small style={{ color: 'var(--text-light)' }}>{slot?.startTime} - {slot?.endTime}</small>
+                            Period {index + 1} <br />
+                            <small style={{ color: 'var(--text-light)' }}>
+                              {slot?.startTime} - {slot?.endTime}
+                            </small>
                           </th>
                         ));
                       })()}

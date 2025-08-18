@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import axios from 'axios';
-import '../../styles/Dashboard.css'; // Reusing existing dashboard styles
+import '../../styles/Dashboard.css';
 import TeacherSidebar from '../../components/TeacherSidebar';
 import Navbar from '../../components/Navbar';
 import { useAuth } from '../../context/AuthContext';
@@ -8,39 +8,38 @@ import { useAuth } from '../../context/AuthContext';
 function CreateAttendance() {
   const { user } = useAuth();
   const API_BASE_URL = import.meta.env.VITE_API_URL;
-
   const [classes, setClasses] = useState([]);
-  const [subjects, setSubjects] = useState([]);
   const [timetables, setTimetables] = useState([]);
   const [timeSlots, setTimeSlots] = useState([]);
   const [students, setStudents] = useState([]);
-  const [attendanceRecords, setAttendanceRecords] = useState({});
-  //const [absentStudents, setAbsentStudents] = useState([]);
-
+  const [attendanceRecords, setAttendanceRecords] = useState();
+  const [todayTimetable, setTodayTimetable] = useState({});
   const [selectedClassId, setSelectedClassId] = useState('');
   const [selectedTimetableId, setSelectedTimetableId] = useState('');
   const [selectedPeriodId, setSelectedPeriodId] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const daysOfWeek = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const today = new Date();
+  const formatted = today.toISOString().split("T")[0];
+  const todaysDay = new Date().getDay();
+  const todayName = daysOfWeek[todaysDay];
+  const [selectedDay, setSelectedDay] = useState(todayName);
+  const [todayClasses, setTodayClasses] = useState([]);
 
-  // Helper function to fetch all necessary initial data
+  // Helper function to fetch classes
   const fetchInitialData = async () => {
     if (!user?._id) return;
     setLoading(true);
     setError('');
-
     try {
       const classesRes = await axios.get(`${API_BASE_URL}/api/v1/teacher/${user._id}`, { withCredentials: true });
-
       console.log('Classes:', classesRes.data);
       if (classesRes.data.mapped) {
-
         const uniqueClassIds = new Set();
         const uniqueClasses = [];
-        
         classesRes.data.mapped.forEach(mapping => {
           // Check if the class ID has already been added
           if (mapping.classId && !uniqueClassIds.has(mapping.classId._id)) {
@@ -48,32 +47,19 @@ function CreateAttendance() {
             uniqueClasses.push(mapping.classId);
           }
         });
-        
         setClasses(uniqueClasses);
-
-        classesRes.data.mapped.forEach(mapping => {
-          if (mapping.subjectId && !subjects.some(sub => sub._id === mapping.subjectId._id)) {
-            setSubjects(prevSubjects => [...prevSubjects, mapping.subjectId]);
-            // console.log('Subject added:', mapping.subjectId);
-          }
-        });
-        // console.log('Unique Classes:', uniqueClasses);
-
       } else {
         throw new Error('Failed to fetch classes.');
       }
-
+      
       // Fetch all time slots
       const timeSlotsRes = await axios.get(`${API_BASE_URL}/api/v1/teacher/getallslots`, { withCredentials: true });
       console.log('Time Slots:', timeSlotsRes.data);
       if (timeSlotsRes.data) {
-        setTimeSlots(timeSlotsRes.data);
+        setTimeSlots(timeSlotsRes);
       } else {
         throw new Error('Failed to fetch time slots.');
       }
-
-
-
     } catch (err) {
       setError('Failed to load initial data.');
       console.error('Error fetching initial data:', err);
@@ -98,67 +84,49 @@ function CreateAttendance() {
       }
       try {
         setLoading(true);
-        const res = await axios.get(`${API_BASE_URL}/api/v1/teacher/getalldailyschedules/${selectedClassId}`, { withCredentials: true });
-        console.log('Fetched Timetables:', res.data.data);
-        setTimetables(res.data.data || []);
+        const res2 = await axios.get(`${API_BASE_URL}/api/v1/teacher/getalldailyschedules/${selectedClassId}`, { withCredentials: true });
+        console.log('Fetched Timetables:', res2);
+        setTimetables(res2.data.data);
       } catch (err) {
         setError('Failed to fetch timetables for the selected class.');
       } finally {
         setLoading(false);
       }
+
     };
     fetchTimetables();
+    
   }, [selectedClassId, API_BASE_URL]);
 
-  // Fetch students and existing attendance when class, date, and period are selected
-  // useEffect(() => {
-  //   const fetchStudentsAndAttendance = async () => {
-  //     if (!selectedClassId || !date || !selectedPeriodId) {
-  //       setStudents([]);
-  //       setAttendanceRecords({});
-  //       return;
-  //     }
-  //     setLoading(true);
-  //     setError('');
-  //     setSuccess('');
-  //     try {
-  //       const studentsResponse = await axios.get(`${API_BASE_URL}/api/v1/teacher/classes/${selectedClassId}/students`, { withCredentials: true });
-  //       if (studentsResponse.data.success) {
-  //         const fetchedStudents = studentsResponse.data.data;
-  //         setStudents(fetchedStudents);
+  useEffect(() => {
+    const filterTimetables = () => {
+      try {
+        console.log("4 time tables : ", timetables);
+        console.log("today's day", todayName);
+        const filteredTimetable = timetables.filter(
+          tt => tt.day.toLowerCase() === todayName.toLowerCase()
+        );
+        console.log("filtered time table - day - ",filteredTimetable);
+        setTodayTimetable(filteredTimetable);
+      } catch (err) {
+        console.log("error occured when filtering timetables: ", err);
+      }
+    }
+    filterTimetables();
+  }, [timetables]);
 
-  //         const initialAttendance = {};
-  //         fetchedStudents.forEach(student => {
-  //           initialAttendance[student._id] = { status: 'present', remarks: '' };
-  //         });
-  //         setAttendanceRecords(initialAttendance);
-
-  //         const existingAttendanceResponse = await axios.get(`${API_BASE_URL}/api/v1/teacher/attendance/${selectedClassId}/${date}/${selectedPeriodId}`, { withCredentials: true });
-  //         if (existingAttendanceResponse.data.success && existingAttendanceResponse.data.data.length > 0) {
-  //           const existingRecords = existingAttendanceResponse.data.data;
-  //           const updatedAttendance = { ...initialAttendance };
-  //           existingRecords.forEach(record => {
-  //             updatedAttendance[record.studentId] = {
-  //               status: record.status,
-  //               remarks: record.remarks || ''
-  //             };
-  //           });
-  //           setAttendanceRecords(updatedAttendance);
-  //         }
-  //       } else {
-  //         throw new Error('Failed to fetch students.');
-  //       }
-  //     } catch (err) {
-  //       setError('Failed to load students or attendance for this class and period.');
-  //       setStudents([]);
-  //       setAttendanceRecords({});
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchStudentsAndAttendance();
-  // }, [selectedClassId, date, selectedPeriodId, API_BASE_URL]);
-
+  useEffect(() => {
+    const filterPeriods = () => {
+      try {
+        const periodsInTimeTable = todayTimetable[0].periods.filter(item => item.mapped !== null).map(item => item.period);
+        const filteredPeriods = (timeSlots.data).filter(ts => periodsInTimeTable.some(pt => pt._id === ts._id));
+        setTodayClasses(filteredPeriods);
+      } catch (err) {
+        console.log("error occured when filtering classes: ", err);
+      }
+    }
+    filterPeriods();
+  }, [timeSlots, todayTimetable]);
 
   //fetch all students when class is selected
   useEffect(() => {
@@ -196,7 +164,6 @@ function CreateAttendance() {
     fetchStudents();
   }, [selectedClassId, API_BASE_URL]);
 
-
   const handleClassChange = (e) => {
     setSelectedClassId(e.target.value);
     setSelectedTimetableId('');
@@ -211,17 +178,6 @@ function CreateAttendance() {
         [field]: value,
       },
     }));
-
-    // setAbsentStudents(prevAbsent => {
-    //   if (field === 'status') {     
-    //     if (value === 'absent' && !prevAbsent.includes(studentId)) {
-    //       return [...prevAbsent, studentId];
-    //     } else if (value !== 'absent' && prevAbsent.includes(studentId)) {
-    //       return prevAbsent.filter(id => id !== studentId);
-    //     }
-    //   }
-    //   return prevAbsent;
-    // });
   };
 
   const handleSubmitAttendance = async (e) => {
@@ -282,7 +238,7 @@ function CreateAttendance() {
       <main className="main-content">
         <Navbar pageTitle="Mark Student Attendance" />
         <div className="form-container" style={{ width: '100%', maxWidth: '100%', margin: '0 auto', background: 'var(--surface)', padding: 32, borderRadius: 12, boxShadow: '0 2px 8px var(--border-color)' }}>
-          <h2 style={{ marginBottom: 24, color: 'var(--primary)', fontWeight: 700 }}>Mark Student Attendance</h2>
+          {/* <h2 style={{ marginBottom: 24, color: 'var(--primary)', fontWeight: 700 }}>Mark Student Attendance</h2> */}
           <form onSubmit={handleSubmitAttendance}>
             <div style={{ marginBottom: '20px', display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'center' }}>
               <div>
@@ -290,9 +246,11 @@ function CreateAttendance() {
                 <input
                   type="date"
                   id="date-select"
-                  value={date}
+                  value={formatted}
                   onChange={(e) => setDate(e.target.value)}
                   required
+                  disabled
+                  readOnly
                   style={{ padding: '8px', borderRadius: 6, border: '1px solid var(--border-color)', background: 'var(--input-background)', color: 'var(--input-text)' }}
                 />
               </div>
@@ -316,24 +274,23 @@ function CreateAttendance() {
               </div>
               {timetables.length > 0 && (
                 <div>
-                  <label htmlFor="timetable-select" style={{ marginRight: '10px', fontWeight: 500 }}>Select Timetable:</label>
-                  <select
-                    id="timetable-select"
-                    value={selectedTimetableId}
-                    onChange={(e) => setSelectedTimetableId(e.target.value)}
+                  <label htmlFor="timetable-select" style={{ marginRight: '10px', fontWeight: 500 }}>Day:</label>
+                  <input 
+                    type="text"
+                    id="timetable-select" 
+                    value={todayName}
+                    onChange={(e) => {
+                      setSelectedTimetableId(e.target.value)
+                      setSelectedDay(e.target.value)
+                    }}
                     required
-                    style={{ padding: '8px', borderRadius: 6, border: '1px solid var(--border-color)', minWidth: 180, background: 'var(--input-background)', color: 'var(--input-text)' }}
-                  >
-                    <option value="">-- Select Timetable --</option>
-                    {timetables.map(tt => (
-                      <option key={tt._id} value={tt._id}>
-                        Daily Schedule for {tt.day}
-                      </option>
-                    ))}
-                  </select>
+                    disabled
+                    readOnly
+                    style={{ padding: '8px', borderRadius: 6, border: '1px solid var(--border-color)', background: 'var(--input-background)', color: 'var(--input-text)' }}
+                  />
                 </div>
               )}
-              {selectedTimetableId && (
+              {timetables && selectedClassId && (
                 <div>
                   <label htmlFor="period-select" style={{ marginRight: '10px', fontWeight: 500 }}>Select Period:</label>
                   <select
@@ -344,21 +301,9 @@ function CreateAttendance() {
                     style={{ padding: '8px', borderRadius: 6, border: '1px solid var(--border-color)', minWidth: 180, background: 'var(--input-background)', color: 'var(--input-text)' }}
                   >
                     <option value="">-- Select Period --</option>
-                    {/* {timetables.find(tt => tt._id === selectedTimetableId)?.periods.map(period => {
-                      const timeSlot = timeSlots.find(slot => slot._id === period.periodId);
-                      return (
-                        <option key={period._id} value={period.periodId}>
-                          {timeSlot?.period} ({timeSlot?.startTime} - {timeSlot?.endTime})
-                        </option>
-                      );
-                    })} */}
-                    {timeSlots
-                      .filter(ts => !ts.period.toLowerCase().includes("break"))
-                      .map(slot => (
-                        <option key={slot._id} value={slot._id}>
-                          {slot.period} ({slot.startTime} - {slot.endTime})
-                        </option>
-                      ))}
+                      {todayClasses.map(tc => 
+                        <option key={tc._id} value="tc._id">{tc.period}</option>
+                      )}
                   </select>
                 </div>
               )}
