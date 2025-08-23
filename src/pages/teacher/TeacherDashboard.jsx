@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { FaIdCard, FaUser, FaEnvelope, FaBook, FaChalkboard } from 'react-icons/fa';
 import axios from 'axios';
 import '../../styles/Dashboard.css';
-import Sidebar from '../../components/TeacherSidebar'; // Adjust path if necessary
-import Navbar from '../../components/Navbar'; // Reuse existing Navbar
+import Sidebar from '../../components/TeacherSidebar';
+import Navbar from '../../components/Navbar';
 import TeacherSidebar from '../../components/TeacherSidebar';
+import { useAuth } from '../../context/AuthContext';
 
 function TeacherDashboard() {
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [teacherData, setTeacherData] = useState(null);
+  const { user } = useAuth();
 
   // useEffect(() => {
   //   const fetchTeacherData = async () => {
@@ -36,11 +36,11 @@ function TeacherDashboard() {
   // }, []);
 
   const stats = [
-    { icon: <FaIdCard />, title: 'Teacher ID', value: teacherData?.id || '-' },
-    { icon: <FaUser />, title: 'Name', value: teacherData?.name || '-' },
-    { icon: <FaEnvelope />, title: 'Email', value: teacherData?.email || '-' },
-    { icon: <FaBook />, title: 'Subjects', value: teacherData?.subjects?.join(', ') || '-' },
-    { icon: <FaChalkboard />, title: 'Classes', value: teacherData?.classes?.join(', ') || '-' },
+    { icon: <FaIdCard />, title: 'Teacher ID', value: user?.id || '-' },
+    { icon: <FaUser />, title: 'Name', value: user?.name || '-' },
+    { icon: <FaEnvelope />, title: 'Email', value: user?.email || '-' },
+    { icon: <FaBook />, title: 'Subjects', value: user?.subjects?.join(', ') || '-' },
+    { icon: <FaChalkboard />, title: 'Classes', value: user?.classes?.join(', ') || '-' },
   ];
 
   const upcomingEvents = [
@@ -51,7 +51,7 @@ function TeacherDashboard() {
 
   return (
     <div className="dashboard-container">
-      <TeacherSidebar teacherData={teacherData} />
+      <TeacherSidebar />
       <main className="main-content">
         <Navbar pageTitle={"Dashboard"} />
         <div className="stats-grid">

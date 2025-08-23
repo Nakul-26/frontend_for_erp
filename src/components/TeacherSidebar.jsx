@@ -24,16 +24,10 @@ function TeacherSidebar() {
       </div>
       <nav className="sidebar-nav">
         <Link to="/teacher/dashboard" data-icon="🏠">Dashboard</Link>
-{/*         <Link to="/teacher/timetable" data-icon="📅">Timetable</Link> */}
-        {/* New link for attendance */}
-{/*         <Link to="/teacher/studentattendance" data-icon="✔️">Take Attendance</Link> */}
-{/*         <Link to="/teacher/attendance/history" data-icon="📝">Attendance History</Link> Keep this for history view */}
-{/*         <Link to="/teacher/grades" data-icon="📊">Grades</Link> */}
         <Link to="/teacher/change-password" data-icon="🔒">Change Password</Link>
         <Link to="/teacher/schedule" data-icon="📅">View Schedule</Link>
-        {/* <Link to="/teacher/settings" data-icon="⚙️">Settings</Link> */}
         <Link to="/teacher/create-attendance" data-icon="📝">Create Attendance</Link>
-{/*         <Link to="/teacher/settings" data-icon="⚙️">Settings</Link> */}
+        <Link to="/teacher/manage-attendance" data-icon="📋">Manage Attendance</Link>
       </nav>
     </aside>
   );
