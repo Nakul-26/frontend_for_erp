@@ -4,12 +4,14 @@ import '../../styles/Login.css';
 import { FaUser, FaLock } from 'react-icons/fa';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 function StudentLogin() {
   const [rollNo, setRollNo] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +26,11 @@ function StudentLogin() {
         { withCredentials: true }
       );
 
+      console.log('Login response:', response);
+
       if (response.data.success) {
+        const userData = { ...response.data.data, role: 'student' };
+        login(userData);
         navigate('/student/dashboard');
       } else {
         setError('Invalid credentials');

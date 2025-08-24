@@ -293,8 +293,8 @@ function StudentsPage() {
         )}
 
         <div>
-          <select name="class" value={selectedClassId} onChange={(e) => setSelectedClassId(e.target.value)} className="filter-select">
-            <option value="">All Classes</option>
+          <select name="class" value={selectedClassId} onChange={(e) => setSelectedClassId(e.target.value)} className="filter-select" style={{ height: '40px', borderRadius: '4px', border: '1px solid #ccc', padding: '0 10px', backgroundColor: '#ffffffff', color: '#000000ff', marginBottom: '20px' }}>
+            <option value="">--- Select Class ---</option>
             {allClasses.map(cls => (
               <option key={cls._id} value={cls._id}>{cls.name}</option>
             ))}
@@ -304,7 +304,7 @@ function StudentsPage() {
         {loading ? (
           <div style={{ textAlign: 'center', fontSize: '18px', color: '#666' }}>Loading...</div>
         ) : filteredAndSortedStudents.length === 0 ? (
-          <div style={{ textAlign: 'center', fontSize: '18px', color: '#666' }}>No students found matching your criteria.</div>
+          <div style={{ textAlign: 'center', fontSize: '18px', color: '#666' }}>Please select a class</div>
         ) : (
           isTableView ? (
             <Suspense fallback={<div>Loading table view...</div>}>
@@ -312,7 +312,7 @@ function StudentsPage() {
             </Suspense>
           ) : (
             <div className="cards-grid">
-              {filteredAndSortedStudents.map((student) => (
+              {selectedClassId && filteredAndSortedStudents.map((student) => (
                 console.log('Rendering StudentCard for:', student),
                 <StudentCard 
                   key={student.rollno}

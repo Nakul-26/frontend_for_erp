@@ -4,19 +4,12 @@ import '../../styles/Dashboard.css';
 import StudentSidebar from '../../components/StudentSidebar';
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
+import { useAuth } from '../../context/AuthContext';
 
 function StudentDashboard() {
   const [studentData, setStudentData] = useState(null);
-
-  useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem('studentData'));
-    setStudentData(storedData || {
-      rollno: 'STU001',
-      name: 'Alice Smith',
-      email: 'alice@college.edu',
-      Class: '10A',
-    });
-  }, []);
+  const { user } = useAuth();
+  const studentId = user?.id;
 
   const stats = [
     { icon: <FaIdCard />, title: 'Roll No', value: studentData?.rollno || '-' },

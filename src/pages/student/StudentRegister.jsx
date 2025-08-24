@@ -123,7 +123,7 @@ function StudentRegister() {
         throw new Error('Failed to register student');
       }
     } catch (err) {
-      setError('Unable to register student via backend.');
+      setError('Unable to register student via backend.', err);
     }
   };
 
