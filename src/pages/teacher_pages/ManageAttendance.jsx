@@ -154,6 +154,8 @@ function ManageAttendance() {
     setRecords(updated);
     // setSuccess("Attendance updated locally!");
 
+    console.log("updating attendance to: ", updated);
+
     try {
       const res = await axios.put(
         `${API_BASE_URL}/api/v1/attendance/update/${records.attendance._id}`,
@@ -196,8 +198,11 @@ function ManageAttendance() {
             <div>
               <label>Select Class: </label>
               <select
-                value={classId}
-                onChange={(e) => setClassId(e.target.value)}
+                value={classId && selectedClassId ? selectedClassId : classId}
+                onChange={(e) => {
+                  setClassId(e.target.value);
+                  setSelectedClassId(e.target.value);
+                }}
                 required
               >
                 <option value="">-- Select Class --</option>
@@ -220,6 +225,10 @@ function ManageAttendance() {
               Get Class Attendance
             </button>
           </div>
+
+          <hr />
+
+          <br />
 
           {/* Search by student */}
           <div style={{ display: "flex", gap: 20, marginBottom: 20 }}>
