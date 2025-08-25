@@ -54,6 +54,8 @@ function ManageAttendance() {
           `${API_BASE_URL}/api/v1/teacher/getallslots`,
           { withCredentials: true }
         );
+        console.log("timeSlots: ", slotsRes.data);
+
         setTimeSlots(slotsRes.data || []);
       } catch (err) {
         console.error("Error fetching initial data:", err);
@@ -279,6 +281,7 @@ function ManageAttendance() {
                   <thead>
                     <tr>
                       <th>Date</th>
+                      <th>Period</th>
                       <th>Class</th>
                       <th>Student</th>
                       <th>Status</th>
@@ -286,47 +289,47 @@ function ManageAttendance() {
                     </tr>
                   </thead>
                   <tbody>
-                    {console.log("records:", records)}
-                    {records && students.map((student) => {
-                      const isAbsent =
-                        records.attendance.includes(student._id);
-                      return (
-                        <tr key={student._id}>
-                          <td>{date}</td>
-                          <td>
-                            {
-                              classes.find((c) => c._id === selectedClassId)
-                                ?.classId
-                            }
-                          </td>
-                          <td>{student.name}</td>
-                          <td style={{ color: isAbsent ? "red" : "green" }}>
-                            {isAbsent ? "Absent" : "Present"}
-                          </td>
-                          <td>
-                            <button
-                              onClick={() => handleToggleAttendance(student._id)}
-                            >
-                              Toggle Attendence
-                            </button>
-                            
-                          </td>
+                    {records && records.attendance.map((record, rIndex) => (
+                      students.map((student) => {
+                        const isAbsent = record.absent.includes(student._id);
 
-                          
-                        </tr>
-
-                        
-                      );
-                    })}
+                        return (
+                          <tr key={`${record._id}-${student._id}`}>
+                            <td>{date}</td>
+                            {console.log("ts: ",timeSlots.find(ts => ts._id === record.period))}
+                            {/* {console.log("record.period: ",record.period)} */}
+                            <td>{timeSlots.find(ts => ts._id === record.period).period}</td>
+                            <td>
+                              {
+                                classes.find((c) => c._id === selectedClassId)
+                                  ?.classId
+                              }
+                            </td>
+                            <td>{student.name}</td>
+                            <td style={{ color: isAbsent ? "red" : "green" }}>
+                              {isAbsent ? "Absent" : "Present"}
+                            </td>
+                            <td>
+                              <button
+                                onClick={() => handleToggleAttendance(student._id, record._id)}
+                              >
+                                Toggle Attendance
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ))}
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colSpan={5}>
+                      <td colSpan={6}>
                         <button onClick={handleDeleteAttendance}>Delete All Attendance</button>
                       </td>
                     </tr>
                   </tfoot>
                 </table>
+
               </div>
             </div>
           )}
