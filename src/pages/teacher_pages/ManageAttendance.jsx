@@ -144,12 +144,12 @@ function ManageAttendance() {
     if (!records?.attendance) return;
 
     const updated = { ...records };
-    if (updated.attendance.absent.includes(studentId)) {
-      updated.attendance.absent = updated.attendance.absent.filter(
+    if (updated.attendance.includes(studentId)) {
+      updated.attendance = updated.attendance.filter(
         (id) => id !== studentId
       );
     } else {
-      updated.attendance.absent = [...updated.attendance.absent, studentId];
+      updated.attendance = [...updated.attendance, studentId];
     }
     setRecords(updated);
     // setSuccess("Attendance updated locally!");
@@ -277,9 +277,10 @@ function ManageAttendance() {
                     </tr>
                   </thead>
                   <tbody>
-                    {students.map((student) => {
+                    {console.log("records:", records)}
+                    {records && students.map((student) => {
                       const isAbsent =
-                        records.attendance.absent.includes(student._id);
+                        records.attendance.includes(student._id);
                       return (
                         <tr key={student._id}>
                           <td>{date}</td>
