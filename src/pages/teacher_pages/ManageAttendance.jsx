@@ -46,6 +46,7 @@ function ManageAttendance() {
               uniqueClasses.push(mapping.classId);
             }
           });
+          console.log("uniqueClasses: ", uniqueClasses);
           setClasses(uniqueClasses);
         }
 
@@ -82,6 +83,8 @@ function ManageAttendance() {
           `${API_BASE_URL}/api/v1/teacher/class/${selectedClassId}/students`,
           { withCredentials: true }
         );
+        console.log("students in class: ", res.data);
+
         if (res.data.success) {
           setStudents(res.data.data || []);
         }
@@ -109,7 +112,9 @@ function ManageAttendance() {
         `${API_BASE_URL}/api/v1/attendance/class/${classId}/date/${date}`,
         { withCredentials: true }
       );
-      setRecords(res.data || null);
+      console.log("class attendance: ", res.data);
+
+      setRecords(res.data);
     } catch (err) {
       console.error("Error fetching class attendance:", err);
       setError("Failed to load attendance records.");
@@ -131,6 +136,8 @@ function ManageAttendance() {
         `${API_BASE_URL}/api/v1/attendance/student/${studentId}`,
         { withCredentials: true }
       );
+      console.log("student attendance: ", res.data);
+
       setRecords(res.data.data || null);
     } catch (err) {
       console.error("Error fetching student attendance:", err);
@@ -142,26 +149,24 @@ function ManageAttendance() {
   };
 
   /** ================== TOGGLE ATTENDANCE ================== */
-  const handleToggleAttendance = async (studentId) => {
+  const handleToggleAttendance = async (studentId, recordIndex) => {
     if (!records?.attendance) return;
+    const updated = { ...records.attendance.find(rec => rec._id === recordIndex) };
 
-    const updated = { ...records };
-    if (updated.attendance.includes(studentId)) {
-      updated.attendance = updated.attendance.filter(
+    if (updated.absent.includes(studentId)) {
+      updated.absent = updated.absent.filter(
         (id) => id !== studentId
       );
     } else {
-      updated.attendance = [...updated.attendance, studentId];
+      updated.absent = [...updated.absent, studentId];
     }
     setRecords(updated);
     // setSuccess("Attendance updated locally!");
 
-    console.log("updating attendance to: ", updated);
-
     try {
       const res = await axios.put(
-        `${API_BASE_URL}/api/v1/attendance/update/${records.attendance._id}`,
-        updated.attendance,
+        `${API_BASE_URL}/api/v1/attendance/update/${recordIndex}`,
+        updated,
         { withCredentials: true }
       );
       console.log("Attendance updated successfully:", res.data);
@@ -172,10 +177,10 @@ function ManageAttendance() {
   };
 
   /** ================== DELETE ATTENDANCE ================== */
-  const handleDeleteAttendance = async () => {
+  const handleDeleteAttendance = async (recordId) => {
     try {
       const res = await axios.delete(
-        `${API_BASE_URL}/api/v1/attendance/delete/${records.attendance._id}`,
+        `${API_BASE_URL}/api/v1/attendance/delete/${recordId}`,
         {withCredentials: true}
       );
       console.log("response to deleting attendance: ",res);
@@ -189,9 +194,6 @@ function ManageAttendance() {
       <TeacherSidebar />
       <main className="main-content">
         <Navbar pageTitle="Manage Attendance Records" />
-
-        
-
         <div className="form-container">
           <h2>Search Attendance</h2>
 
@@ -290,44 +292,42 @@ function ManageAttendance() {
                   </thead>
                   <tbody>
                     {records && records.attendance.map((record, rIndex) => (
-                      students.map((student) => {
-                        const isAbsent = record.absent.includes(student._id);
+                      <React.Fragment key={record._id}>
+                        {students.map((student) => {
+                          const isAbsent = record.absent.some(student2 => student2._id === student._id);
+                          const slot = timeSlots.find(ts => ts._id === record.period);
 
-                        return (
-                          <tr key={`${record._id}-${student._id}`}>
-                            <td>{date}</td>
-                            {console.log("ts: ",timeSlots.find(ts => ts._id === record.period))}
-                            {/* {console.log("record.period: ",record.period)} */}
-                            <td>{timeSlots.find(ts => ts._id === record.period).period}</td>
-                            <td>
-                              {
-                                classes.find((c) => c._id === selectedClassId)
-                                  ?.classId
-                              }
-                            </td>
-                            <td>{student.name}</td>
-                            <td style={{ color: isAbsent ? "red" : "green" }}>
-                              {isAbsent ? "Absent" : "Present"}
-                            </td>
-                            <td>
-                              <button
-                                onClick={() => handleToggleAttendance(student._id, record._id)}
-                              >
-                                Toggle Attendance
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })
+                          return (
+                            <tr key={`${record._id}-${student._id}`}>
+                              <td>{date}</td>
+                              <td>{slot ? slot.period : "Unknown"}</td>
+                              <td>{classes.find((c) => c._id === selectedClassId)?.classId}</td>
+                              <td>{student.name}</td>
+                              <td style={{ color: isAbsent ? "red" : "green" }}>
+                                {isAbsent ? "Absent" : "Present"}
+                              </td>
+                              <td>
+                                <button onClick={() => handleToggleAttendance(student._id, record._id)}>
+                                  Toggle Attendance
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        {/* Add Delete All for this specific record */}
+                        <tr>
+                          
+                          <td colSpan={6}>
+                            <button onClick={() => handleDeleteAttendance(record._id)}>
+                              Delete All Attendance ({timeSlots.find(ts => ts._id === record.period)?.period})
+                            </button>
+                          </td>
+                        </tr>
+                      </React.Fragment>
                     ))}
+
                   </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colSpan={6}>
-                        <button onClick={handleDeleteAttendance}>Delete All Attendance</button>
-                      </td>
-                    </tr>
-                  </tfoot>
+                  
                 </table>
 
               </div>
