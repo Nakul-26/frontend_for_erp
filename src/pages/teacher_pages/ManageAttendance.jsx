@@ -197,6 +197,8 @@ function ManageAttendance() {
         <div className="form-container">
           <h2>Search Attendance</h2>
 
+          <br />
+
           {/* Search by class/date */}
           <div style={{ display: "flex", gap: 20, marginBottom: 20 }}>
             <div>
